@@ -11,6 +11,9 @@ public class ShellParser extends Parser{
         String first = peek().value.toLowerCase();
         switch(first)
         {
+            case "mkdir" -> {
+                return new MakeDirectoryParser(this.getTokens()).parse();
+            }
             case "cd" ->
             {
                 return new ChangeDirectoryParser(this.getTokens()).parse();

@@ -3,15 +3,20 @@ package org.example.Parser;
 import org.example.Command.RemoveCommand;
 import org.example.Lexer.Token;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Queue;
 
 public class RemoveParser extends Parser {
 
-    public RemoveParser(List<Token> tokens)
+    public RemoveParser(Queue<Token> tokens)
     {
         this.setTokens(tokens);
+        allowedFlags.add("-r");
+    }
+
+    public RemoveParser(List<Token> tokens)
+    {
+        this.add(tokens);
         allowedFlags.add("-r");
     }
 
@@ -22,12 +27,14 @@ public class RemoveParser extends Parser {
         if(!expect("rm"))
             throw new Exception("ERROR: rm EXPECTED");
 
-        if(!peek(Token.TYPES.STRING))
-            throw new Exception("ERROR: name of the file EXPECTED");
-        command.setFileName(consume().value);
+        //
+        ParsedArgs parsed = consumeArgs();
+        command.setFlags(parsed.flags());
+        command.setArgs(parsed.args());
 
-        //getting args and validation
-        command.setArgs(consumeArgs());
+        if(parsed.args().isEmpty())
+            throw new Exception("ERROR: name of the file EXPECTED");
+
         return command;
     }
 }

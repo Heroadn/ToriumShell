@@ -1,6 +1,7 @@
 package org.example.Handler;
 
 import org.example.Command.Command;
+import org.example.IO.ShellConsole;
 import org.example.ShellContext;
 
 import java.nio.file.Files;
@@ -11,8 +12,8 @@ import java.util.stream.Stream;
 public class ListHandler implements Handler {
 
     @Override
-    public void execute(Command command, ShellContext context) throws Exception {
-        List<String> args = command.getArgs();
+    public void execute(Command command, ShellContext context, ShellConsole console) throws Exception {
+        List<String> args = command.getFlags();
         Path dir = args.isEmpty()
                 ? context.getCurrentDir()
                 : context.getCurrentDir().resolve(args.get(0));

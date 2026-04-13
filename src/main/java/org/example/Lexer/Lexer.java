@@ -2,170 +2,165 @@ package org.example.Lexer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 //scanner? never heard of it lol
 public class Lexer {
-    private int pos;
-    private String input;
+    private CharStream stream;
 
-    public Lexer() {
-        this.pos = 0;
-        this.input = "";
-    }
+    private static final Map<Character, Token.TYPES> SYMBOLS = Map.ofEntries(
+            Map.entry('*', Token.TYPES.ASTERISK),
+            Map.entry('=', Token.TYPES.OPERATOR),
+            Map.entry('(', Token.TYPES.LPAREM),
+            Map.entry(')', Token.TYPES.RPAREM),
+            Map.entry(',', Token.TYPES.COMMA),
+            Map.entry(';', Token.TYPES.SEMICOLON),
+            Map.entry('.', Token.TYPES.DOT),
+            Map.entry('>', Token.TYPES.OPERATOR),
+            Map.entry('<', Token.TYPES.OPERATOR),
+            Map.entry('!', Token.TYPES.OPERATOR),
+            Map.entry('\\', Token.TYPES.BACK_SLASH),
+            Map.entry('/', Token.TYPES.FORWARD_SLASH)
+    );
+
 
     public List<Token> tokenizer()
     {
         List<Token> tokens = new ArrayList<>();
-        char[] array = input.toCharArray();
+        this.stream.skip(c -> ((Character.isWhitespace(c) || c == '\n')) );
 
-        while(pos < array.length)
+        while(stream.hasNext())
         {
+            if(Character.isWhitespace(stream.peek()))
+                this.stream.consume();
+
             tokens.add(nextToken());
         }
 
-        this.setPos(0);
+        stream.reset();
         return tokens;
     }
 
     public Token nextToken()
     {
-        char[] array = input.toCharArray();
+        //
         Token token = new Token();
-        Token tmp = new Token();
 
-        if(pos >= array.length) return new Token();
-        //skipping white spaces
-        while (pos < array.length
-                && (Character.isWhitespace(array[pos]) || array[pos] == '\n'))
-            pos++;
+        if(!this.stream.hasNext())
+            return token;
+
+        //
+        this.stream.skip(c -> ((Character.isWhitespace(c) || c == '\n')) );
+        char ch = this.stream.peek();
 
         //starts with a 'letter' or '_', pos++ for every char
-        if(Character.isLetter(array[pos]) || array[pos] == '_')
+        if(isStringPrefix(ch))
         {
-            readString(array[pos], token);
+            readString(token);
             return token;
         }
 
-        if(Character.isDigit(array[pos]) || array[pos] == '_')
+        if(isNumberPrefix(ch))
         {
-            readNumber(array[pos], token);
+            readNumber(token);
             return token;
         }
 
-        //* = < + <= . , ;
-        readSymbols(array[pos], token);
-        if((pos + 1) < array.length)
+        return readMultipleOperators(token);
+    }
+
+    private Token readMultipleOperators(Token token) {
+        Token next = new Token();
+
+        //handling single * = < + . , ;
+        readOperators(this.stream.consume(), token);
+
+        //handling, !=, <>, ...
+        if(this.stream.hasNext())
+            readOperators(this.stream.peek(), next);
+
+        if(isOperator(next))
         {
-            //handling, !=, <>, ...
-            readSymbols(array[pos + 1], tmp);
-            if(tmp.key == Token.TYPES.OPERATOR)
-            {
-                token.value += tmp.value;
-                this.pos++;
-            }
+            token.value += next.value;
+            this.stream.advance();
+            return token;
         }
 
-        this.pos++;
         return token;
     }
 
-    private void readString(char c, Token token)
+    private static boolean isOperator(Token tmp) {
+        return tmp.key == Token.TYPES.OPERATOR;
+    }
+
+    private boolean isNumberPrefix(char ch) {
+        return Character.isDigit(ch);
+    }
+
+    //TODO: para os prefixo e letras do meio fazer um mapa
+    //TODO: classe mais especializada para leitura de strings
+    //TODO: BACK_SLASH '/' pode ser operador de divisao
+    //somente caracter de diretorio quando seguido por letra
+    private boolean isStringPrefix(char ch) {
+        return Character.isLetter(ch)
+                || ch == '_'
+                || ch == '-'
+                || ch == '.'
+                || ch == '/';
+    }
+
+    private void readString(Token token)
     {
-        char[] array = this.input.toCharArray();
         token.key = Token.TYPES.STRING;
+        StringBuilder builder = new StringBuilder();
 
-        while (this.pos < array.length &&
-                (Character.isLetterOrDigit(array[pos]) || array[pos] == '_'))
+        while (this.stream.hasNext())
         {
-            token.value += array[pos];
-            pos++;
+            char ch = this.stream.peek();
+            if (!isValidCharInString(ch)) break;
+
+            builder.append(this.stream.consume());
         }
+
+        token.value = builder.toString();
     }
 
-    private void readNumber(char c, Token token)
+    private void readNumber(Token token)
     {
-        char[] array = this.input.toCharArray();
         token.key = Token.TYPES.NUMBER;
+        StringBuilder builder = new StringBuilder();
 
-        while (this.pos < array.length &&
-                (Character.isDigit(array[pos]) || array[pos] == '.'))
+        while (this.stream.hasNext())
         {
-            token.value += array[pos];
-            pos++;
+            char ch = this.stream.peek();
+            if (!isValidCharInNumber(ch)) break;
+
+            builder.append(this.stream.consume());
         }
+
+        token.value = builder.toString();
     }
 
-    private void readSymbols(char c, Token token) {
-        switch (c)
-        {
-            case '*' ->
-            {
-                token.key  = Token.TYPES.ASTERISK;
-                token.value = "*";
-            }
-            case '=' ->
-            {
-                token.key = Token.TYPES.OPERATOR;
-                token.value = "=";
-            }
-            case '(' ->
-            {
-
-                token.key = Token.TYPES.LPAREM;
-                token.value = "(";
-            }
-            case ')' ->
-            {
-                token.key = Token.TYPES.RPAREM;
-                token.value = ")";
-            }
-            case ',' ->
-            {
-                token.key = Token.TYPES.COMMA;
-                token.value = ",";
-            }
-            case ';' ->
-            {
-                token.key = Token.TYPES.SEMICOLON;
-                token.value = ";";
-            }
-            case '.' ->
-            {
-                token.key = Token.TYPES.DOT;
-                token.value = ".";
-            }
-            case '>' ->
-            {
-                token.key = Token.TYPES.OPERATOR;
-                token.value = ">";
-            }
-            case '<' ->
-            {
-                token.key = Token.TYPES.OPERATOR;
-                token.value = "<";
-            }
-            case '!' ->
-            {
-                token.key = Token.TYPES.OPERATOR;
-                token.value = "!";
-            }
-            default -> {}
-        }
-    }
-
-    public int getPos() {
-        return pos;
-    }
-
-    public void setPos(int pos) {
-        this.pos = pos;
-    }
-
-    public String getInput() {
-        return input;
+    private void readOperators(char ch, Token token) {
+        Token.TYPES type = SYMBOLS.getOrDefault(ch, Token.TYPES.UNDEFINED);
+        token.key = type;
+        token.value = (type == Token.TYPES.UNDEFINED) ? "" : String.valueOf(ch);
     }
 
     public void setInput(String input) {
-        this.input = input;
+        this.stream = new CharStream(input);
+    }
+
+    private static boolean isValidCharInString(char ch) {
+        return Character.isLetterOrDigit(ch)
+                || ch == '_'
+                || ch == '-'
+                || ch == '.'
+                || ch == '\\'
+                || ch == '/';
+    }
+
+    private boolean isValidCharInNumber(char ch) {
+        return isNumberPrefix(ch) || ch == '.';
     }
 }

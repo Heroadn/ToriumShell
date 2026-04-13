@@ -1,18 +1,20 @@
 package org.example.Parser;
 
 import org.example.Command.MakeDirectoryCommand;
-import org.example.Command.RemoveCommand;
 import org.example.Lexer.Token;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class MakeDirectoryParser extends Parser {
-    public MakeDirectoryParser(List<Token> tokens)
+    public MakeDirectoryParser(Queue<Token> tokens)
     {
         this.setTokens(tokens);
+        allowedFlags.add("-p");
+    }
+
+    public MakeDirectoryParser(List<Token> tokens)
+    {
+        this.add(tokens);
         allowedFlags.add("-p");
     }
 
@@ -23,12 +25,14 @@ public class MakeDirectoryParser extends Parser {
         if(!expect("mkdir"))
             throw new Exception("ERROR: mkdir EXPECTED");
 
-        if(!peek(Token.TYPES.STRING))
-            throw new Exception("ERROR: name of the file EXPECTED");
-        command.setFileName(consume().value);
+        //
+        ParsedArgs parsed = consumeArgs();
+        command.setFlags(parsed.flags());
+        command.setArgs(parsed.args());
 
-        //getting args and validation
-        command.setArgs(consumeArgs());
+        if(parsed.args().isEmpty())
+            throw new Exception("ERROR: name of the file EXPECTED");
+
         return command;
     }
 }

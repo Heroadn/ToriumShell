@@ -9,6 +9,8 @@ public class Token
         STRING,
         LPAREM,
         RPAREM,
+        FORWARD_SLASH,
+        BACK_SLASH,
         COMMA,
         SEMICOLON,
         EQUALS,
@@ -30,6 +32,12 @@ public class Token
     public Token(TYPES key, String value) {
         this.key = key;
         this.value = value;
+    }
+
+    //concatenates values of token
+    public void concat(Token token)
+    {
+        this.value += token.value;
     }
 
     public String toString()

@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Handler.ShellHandler;
+import org.example.IO.ShellConsole;
 import org.example.Lexer.Lexer;
 import org.example.Parser.ShellParser;
 
@@ -9,14 +10,16 @@ import java.util.Scanner;
 
 public class Main {
 
-    static void main(String[] args)
+    public static void main(String[] args)
     {
         Scanner scanner = new Scanner(System.in);
         Lexer lexer = new Lexer();
         StringBuilder buffer = new StringBuilder();
 
         ShellContext context = new ShellContext();
-        ShellHandler handler = new ShellHandler(context);
+        ShellConsole console = new ShellConsole();
+
+        ShellHandler handler = new ShellHandler(context, console);
         ShellParser  parser = new ShellParser();
         context.setCurrentDir(Path.of(System.getProperty("user.home")));
 
@@ -53,7 +56,7 @@ public class Main {
             ShellParser parser) throws Exception {
 
         lexer.setInput(buffer.toString());
-        parser.setTokens(lexer.tokenizer());
+        parser.add(lexer.tokenizer());
 
         handler.execute(parser.parse());
         buffer.setLength(0);

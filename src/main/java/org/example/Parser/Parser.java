@@ -6,29 +6,23 @@ import java.util.*;
 
 public class Parser {
 
-    private List<Token> tokens;
-    protected Set<String> allowedFlags = new HashSet<>();
-    private int pos;
-
-    public Parser() {
-        this.pos = 0;
-        this.tokens = new ArrayList<>();
-    }
+    private Queue<Token> tokens = new LinkedList<>();
+    public Set<String> allowedFlags = new HashSet<>();
 
     public Token peek()
     {
-        Token token = new Token();
+        Token token = this.tokens.peek();
 
-        if(pos >= this.tokens.size())
-            return token;
+        //returns an undefined token
+        if(token == null)
+            token = new Token();
 
-        token = this.tokens.get(pos);
         return token;
     }
 
     public Boolean peek(Token.TYPES type)
     {
-        return (peek().key == type);
+        return isEqualType(type);
     }
 
     public Boolean peek(String value)
@@ -38,13 +32,10 @@ public class Parser {
 
     public Token consume()
     {
-        Token token = new Token();
+        Token token = tokens.poll();
+        if(token == null)
+            token = new Token();
 
-        if(pos >= this.tokens.size())
-            return token;
-
-        token = this.tokens.get(pos);
-        pos++;
         return token;
     }
 
@@ -60,20 +51,36 @@ public class Parser {
         return Objects.equals(token.key, type);
     }
 
-    protected List<String> consumeArgs() throws Exception {
+    public ParsedArgs consumeArgs() throws Exception {
+        List<String> flags = new ArrayList<>();
         List<String> args = new ArrayList<>();
+
         while(!isEmpty())
         {
             Token t = peek();
-            if(t.key == Token.TYPES.EOF) break;
             String value = consume().value;
 
-            if(isFlagPrefix(value) && !isFlagAllowed(value))
+            if(isEndOfFileToken(t)) break;
+
+            if(isFlagPrefix(t.value) && !isFlagAllowed(value))
                 throw new Exception("ERROR: flag not allowed: " + value);
 
-            args.add(value);
+            //
+            if(isFlagPrefix(t.value))
+                flags.add(value);
+            else
+                args.add(value);
         }
-        return args;
+
+        return new ParsedArgs(flags, args);
+    }
+
+    private boolean isEqualType(Token.TYPES type) {
+        return peek().key == type;
+    }
+
+    private boolean isEndOfFileToken(Token t) {
+        return t.key == Token.TYPES.EOF;
     }
 
     private boolean isFlagPrefix(String value) {
@@ -85,25 +92,32 @@ public class Parser {
         return allowedFlags.contains(flag);
     }
 
-    public List<Token> getTokens() {
-        return tokens;
+    public void add(List<Token> tokens)
+    {
+        this.tokens.addAll(tokens);
     }
 
-    public void setTokens(List<Token> tokens)
+    public void reset(List<Token> tokens)
     {
-        this.tokens = tokens;
+        this.tokens.clear();
+        this.tokens.addAll(tokens);
     }
 
     public boolean isEmpty()
     {
-        return this.pos >= this.tokens.size();
+        return this.tokens.isEmpty();
     }
 
-    public int getPos() {
-        return pos;
+    public int size()
+    {
+        return this.tokens.size();
     }
 
-    public void setPos(int pos) {
-        this.pos = pos;
+    public void setTokens(Queue<Token> tokens) {
+        this.tokens = tokens;
+    }
+
+    public Queue<Token> getTokens() {
+        return tokens;
     }
 }

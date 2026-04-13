@@ -2,9 +2,9 @@ package org.example.Handler;
 
 import org.example.Command.Command;
 import org.example.Command.RemoveCommand;
+import org.example.IO.ShellConsole;
 import org.example.ShellContext;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -15,25 +15,27 @@ import static java.util.Collections.reverseOrder;
 public class RemoveHandler implements Handler {
 
     @Override
-    public void execute(Command command, ShellContext context) throws Exception
+    public void execute(Command command, ShellContext context, ShellConsole console) throws Exception
     {
+        List<String> flags = command.getFlags();
         List<String> args = command.getArgs();
-        String fileName = ((RemoveCommand)command).getFileName();
+
+        String fileName = args.getFirst();
         Path dir = context.getCurrentDir().resolve(fileName);
 
-        if(!isInCurrentDir(context, dir))
-            throw new Exception("ERROR: Não pode deletar" +
+        if(fileExists(dir) && !isInCurrentDir(context, dir))
+            throw new Exception("ERROR: Não pode deletar arquivo(s)" +
                     "fora do diretorio atual");
 
         //is a folder but not -r
-        if(isDirectory(dir) && !isRecursiveArg(args))
+        if(isDirectory(dir) && !isRecursiveFlag(flags))
         {
             throw new Exception("ERROR: Não é um arquivo: " +
                     "use -r para apagar recursivamente");
         }
 
         //all checked
-        if (isDirectory(dir) && isRecursiveArg(args)) {
+        if (isDirectory(dir) && isRecursiveFlag(flags)) {
             deleteFolder(dir);
             return;
         }
@@ -65,7 +67,7 @@ public class RemoveHandler implements Handler {
         return Files.isDirectory(dir);
     }
 
-    private static boolean isRecursiveArg(List<String> args) {
+    private static boolean isRecursiveFlag(List<String> args) {
         return args.contains("-r");
     }
 

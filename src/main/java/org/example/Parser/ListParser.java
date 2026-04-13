@@ -4,13 +4,15 @@ import org.example.Command.ListCommand;
 import org.example.Lexer.Token;
 
 import java.util.List;
+import java.util.Queue;
 
 public class ListParser extends Parser {
 
-    public ListParser(List<Token> tokens)
-    {
+    public ListParser(Queue<Token> tokens) {
         this.setTokens(tokens);
     }
+
+    public ListParser(List<Token> tokens) { this.add(tokens); }
 
     public ListCommand parse() throws Exception
     {
@@ -19,7 +21,11 @@ public class ListParser extends Parser {
         if(!expect("ls"))
             throw new Exception("ERROR: ls EXPECTED");
 
-        command.setArgs(consumeArgs());
+        //
+        ParsedArgs parsed = consumeArgs();
+        command.setFlags(parsed.flags());
+        command.setArgs(parsed.args());
+
         return command;
     }
 }

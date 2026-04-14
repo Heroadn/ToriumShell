@@ -28,15 +28,26 @@ public class MakeDirectoryHandler implements Handler {
         if(isDirectoriesFlag(flags))
         {
             Files.createDirectories(path);
-            IO.println("Diretorios criado com sucessor");
+            console.println(directoryRecursiveSuccessMessage());
             return;
         }
 
         Files.createDirectory(path);
-        IO.println("Diretorio criado com sucessor");
+        console.println(directorySuccessMessage());
+    }
+
+    public String directorySuccessMessage()
+    {
+        return "Diretorio criado com sucesso";
+    }
+
+    public String directoryRecursiveSuccessMessage()
+    {
+        return "Diretorios criados com sucesso";
     }
 
     private static boolean isDirectoriesFlag(List<String> args) {
         return args.contains("-p");
     }
+
 }

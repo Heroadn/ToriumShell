@@ -1,5 +1,6 @@
 import org.example.Command.RemoveCommand;
 import org.example.Handler.RemoveHandler;
+import org.example.IO.ShellConsole;
 import org.example.Lexer.Lexer;
 import org.example.Parser.RemoveParser;
 import org.example.ShellContext;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RemoveHandlerTest {
 
     private ShellContext context;
+    private ShellConsole console;
     private RemoveHandler handler;
     private Lexer lexer;
     private Path testDir;
@@ -24,6 +26,9 @@ public class RemoveHandlerTest {
         testDir = Files.createTempDirectory("rm_test");
         context = new ShellContext();
         context.setCurrentDir(testDir);
+
+        console = new ShellConsole();
+
         handler = new RemoveHandler();
         lexer = new Lexer();
     }
@@ -52,14 +57,14 @@ public class RemoveHandlerTest {
     @Test
     void removeArquivoSimples() throws Exception {
         Path arquivo = Files.createFile(testDir.resolve("arquivo.txt"));
-        handler.execute(prepare("rm arquivo.txt"), context);
+        handler.execute(prepare("rm arquivo.txt"), context, console);
         assertFalse(Files.exists(arquivo));
     }
 
     @Test
     void removeArquivoInexistenteLancaErro() {
         assertThrows(Exception.class, () ->
-                handler.execute(prepare("rm naoexiste.txt"), context)
+                handler.execute(prepare("rm naoexiste.txt"), context, console)
         );
     }
 
@@ -67,7 +72,7 @@ public class RemoveHandlerTest {
     void removeDiretorioSemFlagRLancaErro() throws Exception {
         Files.createDirectory(testDir.resolve("pasta"));
         assertThrows(Exception.class, () ->
-                handler.execute(prepare("rm pasta"), context)
+                handler.execute(prepare("rm pasta"), context, console)
         );
     }
 
@@ -78,7 +83,7 @@ public class RemoveHandlerTest {
     @Test
     void removeDiretorioVazioComR() throws Exception {
         Path pasta = Files.createDirectory(testDir.resolve("pasta"));
-        handler.execute(prepare("rm pasta -r"), context);
+        handler.execute(prepare("rm pasta -r"), context, console);
         assertFalse(Files.exists(pasta));
     }
 
@@ -90,7 +95,7 @@ public class RemoveHandlerTest {
         Files.createDirectory(pasta.resolve("sub"));
         Files.createFile(pasta.resolve("sub/c.txt"));
 
-        handler.execute(prepare("rm pasta -r"), context);
+        handler.execute(prepare("rm pasta -r"), context, console);
 
         assertFalse(Files.exists(pasta));
     }
@@ -98,7 +103,7 @@ public class RemoveHandlerTest {
     @Test
     void removeDiretorioInexistenteComRLancaErro() {
         assertThrows(Exception.class, () ->
-                handler.execute(prepare("rm naoexiste -r"), context)
+                handler.execute(prepare("rm naoexiste -r"), context, console)
         );
     }
 
@@ -110,7 +115,7 @@ public class RemoveHandlerTest {
     void removeForaDoCurrentDirLancaErro() throws Exception {
         // tenta deletar um diretório pai — deve ser bloqueado
         assertThrows(Exception.class, () ->
-                handler.execute(prepare("rm .."), context)
+                handler.execute(prepare("rm .."), context, console)
         );
     }
 
@@ -119,7 +124,7 @@ public class RemoveHandlerTest {
         Path externo = Files.createTempFile("externo", ".txt");
         try {
             assertThrows(Exception.class, () ->
-                    handler.execute(prepare("rm " + externo.toAbsolutePath()), context)
+                    handler.execute(prepare("rm " + externo.toAbsolutePath()), context, console)
             );
         } finally {
             Files.deleteIfExists(externo);
@@ -134,7 +139,7 @@ public class RemoveHandlerTest {
     void currentDirNaoMudaAposRemocao() throws Exception {
         Files.createFile(testDir.resolve("x.txt"));
         Path antes = context.getCurrentDir();
-        handler.execute(prepare("rm x.txt"), context);
+        handler.execute(prepare("rm x.txt"), context, console);
         assertEquals(antes, context.getCurrentDir());
     }
 }

@@ -1,33 +1,32 @@
 package org.example.Parser;
 
 import org.example.Command.Command;
+import org.example.Exception.UnknownCommandException;
+
+import java.util.ArrayDeque;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ShellParser extends Parser{
+    private final Map<String, Parser> parsers = new LinkedHashMap<>();
 
-    public ShellParser() {}
+    public ShellParser(Map<String, Parser> parsers)
+    {
+        this.parsers.putAll(parsers);
+    }
 
+    @Override
     public Command parse() throws Exception
     {
         String first = peek().value.toLowerCase();
-        switch(first)
-        {
-            case "mkdir" -> {
-                return new MakeDirectoryParser(this.getTokens()).parse();
-            }
-            case "cd" ->
-            {
-                return new ChangeDirectoryParser(this.getTokens()).parse();
-            }
-            case "ls" ->
-            {
-                return new ListParser(this.getTokens()).parse();
-            }
-            case "rm" -> {
-                return new RemoveParser(this.getTokens()).parse();
-            }
-            default -> throw new Exception("ERROR: UNKNOWN COMMAND " + first);
+        Parser parser = parsers.get(first);
+
+        if (parser == null) {
+            throw new UnknownCommandException(first);
         }
 
+        parser.reset(this.getTokens());
+        return parser.parse();
     }
 
 }

@@ -20,6 +20,7 @@ public class RemoveParser extends Parser {
         allowedFlags.add("-r");
     }
 
+    @Override
     public RemoveCommand parse() throws Exception
     {
         RemoveCommand command = new RemoveCommand();

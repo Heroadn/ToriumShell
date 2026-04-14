@@ -19,12 +19,13 @@ public class ListHandler implements Handler {
                 : context.getCurrentDir().resolve(args.get(0));
 
         //TODO:File formatter
+        //TODO:File service class
         try (Stream<Path> stream = Files.list(dir)) {
             stream.forEach(path -> {
                 if (Files.isDirectory(path)) {
-                    System.out.println("\\" + path.getFileName());
+                    console.println("\\" + path.getFileName());
                 } else {
-                    System.out.println(" " + path.getFileName());
+                    console.println(" " + path.getFileName());
                 }
             });
         }

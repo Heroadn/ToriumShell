@@ -1,6 +1,7 @@
 package org.example.Handler;
 
 import org.example.Command.Command;
+import org.example.Exception.UnknownCommandException;
 import org.example.IO.ShellConsole;
 import org.example.ShellContext;
 
@@ -13,14 +14,11 @@ public class ShellHandler {
     private final Map<String, Handler> handlers = new LinkedHashMap<>();
 
     public ShellHandler(ShellContext context,
-                        ShellConsole console) {
+                        ShellConsole console,
+                        Map<String, Handler> handlers) {
         this.context = context;
         this.console = console;
-
-        handlers.put("cd", new ChangeDirectoryHandler());
-        handlers.put("ls", new ListHandler());
-        handlers.put("rm", new RemoveHandler());
-        handlers.put("mkdir", new MakeDirectoryHandler());
+        this.handlers.putAll(handlers);
     }
 
     public void execute(Command command) throws Exception {
@@ -28,7 +26,7 @@ public class ShellHandler {
         Handler handler = handlers.get(type);
 
         if (handler == null) {
-            throw new Exception("ERROR: UNKNOWN COMMAND " + type);
+            throw new UnknownCommandException(type);
         }
 
         handler.execute(command, context, console);

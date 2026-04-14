@@ -16,29 +16,23 @@ public class Main {
         Lexer lexer = new Lexer();
         StringBuilder buffer = new StringBuilder();
 
+
         ShellContext context = new ShellContext();
         ShellConsole console = new ShellConsole();
 
-        ShellHandler handler = new ShellHandler(context, console);
-        ShellParser  parser = new ShellParser();
+        ShellHandler handler = new ShellHandler(context, console, CommandMapper.handlers());
+        ShellParser  parser = new ShellParser(CommandMapper.parsers());
         context.setCurrentDir(Path.of(System.getProperty("user.home")));
 
         while(context.isRunning()){
-            IO.print(context.getCurrentDir() + " $ ");
+            console.print(context.getCurrentDir() + " $ ");
             String line = scanner.nextLine();
             appendLine(buffer, line);
-
-            if(isExitCommand(line))
-            {
-                context.setRunning(false);
-                return;
-            }
 
             try {
                 execute(buffer, lexer, handler, parser);
             } catch (Exception e) {
-                //throw new RuntimeException(e);
-                IO.println("ERRO: " + e);
+                console.error(e);
             }
         }
 

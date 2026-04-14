@@ -93,4 +93,38 @@ public class ShellConsoleTest {
         // apenas verifica que o construtor sem args não lança exceção
         assertDoesNotThrow(() -> new ShellConsole().println("ok"));
     }
+
+    // -------------------------------------------------------------------------
+    // error
+    // -------------------------------------------------------------------------
+
+    @Test
+    void errorImprimeMensagemDaExcecao() {
+        console.error(new Exception("arquivo não encontrado"));
+        assertTrue(output().contains("arquivo não encontrado"));
+    }
+
+    @Test
+    void errorContemPrefixoErro() {
+        console.error(new Exception("algo deu errado"));
+        assertTrue(output().startsWith("ERRO:"));
+    }
+
+    @Test
+    void errorAdicionaQuebraLinha() {
+        console.error(new Exception("falha"));
+        assertTrue(output().contains(System.lineSeparator()));
+    }
+
+    @Test
+    void errorComMensagemNulaNaoLancaExcecao() {
+        assertDoesNotThrow(() -> console.error(new Exception()));
+    }
+
+    @Test
+    void errorNaoInterferePrintlnSeguinte() {
+        console.error(new Exception("erro"));
+        console.println("ok");
+        assertTrue(output().contains("ok"));
+    }
 }

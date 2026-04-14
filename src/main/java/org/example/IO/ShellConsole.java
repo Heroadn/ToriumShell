@@ -10,4 +10,5 @@ public class ShellConsole {
 
     public void print(String s)   { out.print(s); }
     public void println(String s) { out.println(s); }
+    public void error(Exception e) { out.println("ERRO: " + e.getMessage()); }
 }

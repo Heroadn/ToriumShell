@@ -1,13 +1,20 @@
 package org.example.Parser;
 
+import org.example.Command.BaseCommand;
+import org.example.Command.Command;
 import org.example.Lexer.Token;
 
 import java.util.*;
 
-public class Parser {
+public abstract class Parser {
 
     private Queue<Token> tokens = new LinkedList<>();
     public Set<String> allowedFlags = new HashSet<>();
+
+    public Command Parser()
+    {
+        return new BaseCommand();
+    }
 
     public Token peek()
     {
@@ -97,6 +104,17 @@ public class Parser {
         this.tokens.addAll(tokens);
     }
 
+    public void add(Queue<Token> tokens)
+    {
+        this.setTokens(tokens);
+    }
+
+    public void reset(Queue<Token> tokens)
+    {
+        this.tokens.clear();
+        this.add(tokens);
+    }
+
     public void reset(List<Token> tokens)
     {
         this.tokens.clear();
@@ -120,4 +138,7 @@ public class Parser {
     public Queue<Token> getTokens() {
         return tokens;
     }
+
+    //TODO: estrutura melhor, codigo de comandos espalhados
+    public abstract Command parse() throws Exception;
 }

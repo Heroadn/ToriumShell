@@ -11,14 +11,11 @@
 
     <modules>
         <module>ShellApi</module>
-        <module>ShellCore</module>
-        <module>CorePlugin</module>
     </modules>
 
     <profiles>
         <profile>
-            <id>dev</id>
-
+            <id>full</id>
             <modules>
                 <module>ShellApi</module>
                 <module>ShellCore</module>
@@ -59,4 +56,11 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/Heroadn/ToriumShell</url>
+        </repository>
+    </distributionManagement>
 </project>

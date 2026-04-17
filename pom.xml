@@ -7,20 +7,56 @@
     <groupId>org.example</groupId>
     <artifactId>ToriumShell</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.0</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>ShellApi</module>
+        <module>ShellCore</module>
+        <module>CorePlugin</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+
+            <modules>
+                <module>ShellApi</module>
+                <module>ShellCore</module>
+                <module>CorePlugin</module>
+            </modules>
+
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+    </profiles>
 
     <properties>
         <maven.compiler.source>26</maven.compiler.source>
         <maven.compiler.target>26</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <plugins.dir>../target/plugins</plugins.dir>
+        <shellcore.dir>../target/</shellcore.dir>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>5.10.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.10.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.17.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

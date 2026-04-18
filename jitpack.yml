@@ -1,0 +1,4 @@
+build:
+  jdk: openjdk26
+  commands:
+    - mvn install -pl ShellApi

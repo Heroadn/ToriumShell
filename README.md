@@ -25,10 +25,54 @@ Lexer → ShellParser → AbstractParser (subclasses) → IHandler
 |---------|-------|-------------|
 | `ls` | `ls [-l]` | List directory contents |
 | `cd` | `cd <path>` | Change current directory |
-| `mkdir` | `mkdir <name>` | Create a new directory |
+| `mkdir` | `mkdir <n>` | Create a new directory |
 | `rm` | `rm [-r] <path>` | Remove a file or directory |
 | `echo` | `echo <text>` | Print text to the console |
 | `exit` | `exit` | Exit the shell |
+
+---
+
+## Official Plugins
+
+### TamagochiPlugin
+
+A virtual pet that lives inside your shell. Stats decay over real time — if you forget about it for too long, it dies.
+
+| Command | Description |
+|---------|-------------|
+| `tama new <n>` | Create a new pet |
+| `tama status` | Show pet status with ASCII art and stat bars |
+| `tama eat` | Feed your pet — hunger +30, happiness +10 |
+| `tama feed <food>` | Feed a specific food (`pizza`, `salad`, `candy`) |
+| `tama play` | Play with your pet — happiness +25, energy -20 |
+| `tama sleep` | Put your pet to sleep — energy +50, age +1 |
+| `tama medicine` | Cure a sick pet |
+| `tama rename <n>` | Rename your pet |
+| `tama history` | Show last 10 events |
+| `tama info` | Quick summary without stat bars |
+
+Stats decay every hour your shell is closed: hunger -3, happiness -2, energy -1. Pets die after 48h without attention.
+
+---
+
+## Subcommands
+
+ToriumShell supports two-level subcommands natively. Plugins can register commands like `tama-eat` and users invoke them as `tama eat` with a space — the `ShellParser` joins the tokens automatically.
+
+To register a subcommand, use a hyphen in the `@Command` name:
+
+```java
+@Command(name = "tama-eat", parser = TamaEatParser.class, handler = TamaEatHandler.class)
+public class TamaEatCommand extends BaseCommand {}
+```
+
+The user types:
+
+```
+/home/user $ tama eat
+```
+
+The parser finds no command named `"tama"`, peeks at the next token, tries `"tama-eat"`, finds it in the registry, and dispatches correctly.
 
 ---
 
@@ -47,7 +91,7 @@ mvn install -pl ShellApi
 Run the shell:
 
 ```bash
-java -jar ToriumShell/target/ShellCore.jar
+java -jar ShellCore/target/ShellCore.jar
 ```
 
 Plugins are loaded automatically from the `target/plugins/` directory on startup.
@@ -66,6 +110,10 @@ Anyone can create a plugin without access to `ShellCore`. The only dependency ne
         <id>jitpack.io</id>
         <url>https://jitpack.io</url>
     </repository>
+    <repository>
+        <id>central</id>
+        <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
 </repositories>
 
 <dependencies>
@@ -80,6 +128,8 @@ Anyone can create a plugin without access to `ShellCore`. The only dependency ne
 
 > `scope provided` means ShellApi will not be bundled inside your plugin JAR — the shell already has it on the classpath at runtime.
 
+> If your plugin has its own dependencies (e.g. Jackson for JSON persistence), use `maven-shade-plugin` to produce a fat JAR so those dependencies are bundled inside.
+
 ### 2. Create a Command class
 
 Annotate your command class with `@Command`, pointing to your parser and handler:
@@ -93,11 +143,10 @@ import org.example.api.Command.Command;
     parser  = HelloParser.class,
     handler = HelloHandler.class
 )
-public class HelloCommand extends BaseCommand {
-}
+public class HelloCommand extends BaseCommand {}
 ```
 
-Multiple commands in the same JAR — just annotate each class:
+Multiple commands in the same JAR — one class per command:
 
 ```java
 @Command(name = "hello",   parser = HelloParser.class,   handler = HelloHandler.class)
@@ -105,6 +154,18 @@ public class HelloCommand extends BaseCommand {}
 
 @Command(name = "goodbye", parser = GoodbyeParser.class, handler = GoodbyeHandler.class)
 public class GoodbyeCommand extends BaseCommand {}
+```
+
+For subcommands, use a hyphen in the name — the user types a space:
+
+```java
+// user types: git status
+@Command(name = "git-status", parser = GitStatusParser.class, handler = GitStatusHandler.class)
+public class GitStatusCommand extends BaseCommand {}
+
+// user types: git commit
+@Command(name = "git-commit", parser = GitCommitParser.class, handler = GitCommitHandler.class)
+public class GitCommitCommand extends BaseCommand {}
 ```
 
 ### 3. Create a Parser
@@ -121,7 +182,6 @@ public class HelloParser extends AbstractParser {
     protected ICommand parse() throws Exception {
         HelloCommand cmd = new HelloCommand();
 
-        // consume args and flags
         allowedFlags.add("-l");
         var parsed = consumeArgs();
 
@@ -133,6 +193,8 @@ public class HelloParser extends AbstractParser {
 }
 ```
 
+> Both parsers and handlers **must have a public no-arg constructor** — the `PluginLoader` instantiates them via reflection.
+
 ### 4. Create a Handler
 
 ```java
@@ -140,7 +202,7 @@ import org.example.api.Command.ICommand;
 import org.example.api.Handler.IHandler;
 
 public class HelloHandler implements IHandler {
-  
+
     @Override
     public void execute(ICommand iCommand, IContext iContext, IConsole iConsole) {
         String name = command.getArgs().isEmpty()
@@ -195,13 +257,13 @@ Your `hello.jar` will be copied to the plugins directory. Start the shell and `h
 
 On startup, `PluginLoader` scans every `.jar` file in the `plugins/` directory:
 
-1. Loads each JAR with a `URLClassLoader`
+1. Loads each JAR with a `URLClassLoader` — kept open for the lifetime of the shell
 2. Scans all `.class` files inside the JAR
 3. Finds classes annotated with `@Command`
-4. Registers the command name → parser supplier + handler supplier in `CommandRegistry`
-5. When the user types a command, `ShellParser` looks up the parser by name and the handler dispatches execution
+4. Registers `commandName → (parserSupplier, handlerSupplier)` in `CommandRegistry`
+5. When the user types a command, `ShellParser` resolves the name (including subcommand joining) and dispatches
 
-The classloaders stay open for the lifetime of the shell so that parser and handler instances can be created on demand.
+When the shell exits, all classloaders are closed via `PluginLoader.close()`.
 
 ---
 
@@ -211,7 +273,7 @@ The classloaders stay open for the lifetime of the shell so that parser and hand
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `name` | `String` | yes | Command name as typed by the user |
+| `name` | `String` | yes | Command name. Use `"prefix-sub"` for subcommands (e.g. `"tama-eat"`) |
 | `parser` | `Class<?>` | yes | Parser class — must have a no-arg constructor |
 | `handler` | `Class<?>` | yes | Handler class — must have a no-arg constructor |
 | `description` | `String` | no | Short description (default `""`) |
@@ -242,6 +304,38 @@ public interface IHandler {
 ### `ICommand` / `BaseCommand`
 
 `BaseCommand` provides default implementations for `getArgs()`, `setArgs()`, `getFlags()`, `setFlags()`. Extend it for most commands.
+
+### `ICommandRegistry`
+
+```java
+public interface ICommandRegistry {
+    public void register(
+            Class<? extends ICommand> command,
+            Supplier<IParser> parser,
+            Supplier<IHandler> handler);
+    boolean has(String name);
+}
+```
+
+---
+
+## Releases
+
+| Version | Description |
+|---------|-------------|
+| `main-SNAPSHOT` | Latest from main branch — may be unstable |
+| `v1.0.0` | First stable API release |
+
+To use a specific stable release:
+
+```xml
+<dependency>
+    <groupId>com.github.Heroadn</groupId>
+    <artifactId>ToriumShell</artifactId>
+    <version>v1.0.0</version>
+    <scope>provided</scope>
+</dependency>
+```
 
 ---
 

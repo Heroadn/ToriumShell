@@ -45,4 +45,9 @@ public class CommandRegistry implements ICommandRegistry
     {
         return handlers.get(command);
     }
+
+    public boolean has(String name)
+    {
+        return classes.containsKey(name);
+    }
 }

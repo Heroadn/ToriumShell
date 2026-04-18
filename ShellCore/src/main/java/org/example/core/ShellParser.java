@@ -20,10 +20,28 @@ public class ShellParser extends AbstractParser {
     {
         this.tokens = new ArrayDeque<>(tokens);
         String first = peek().value.toLowerCase();
+
+        if(registry.has(first))
+            dispatch(tokens, first);
+
+        //checking for a subcommand
+        if (!isEmpty()) {
+            String combined = first + "-" + peek().value;
+            if (registry.has(combined)) {
+                consume();
+                return dispatch(tokens, combined);
+            }
+        }
+
+        throw new UnknownCommandException(first);
+    }
+
+    private ICommand dispatch(
+            List<Token> tokens,
+            String first) throws Exception
+    {
         IParser parser = this.registry.getParser(first).get();
-
         if (parser == null) throw new UnknownCommandException(first);
-
         return parser.parse(tokens);
     }
 

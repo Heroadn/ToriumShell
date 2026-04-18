@@ -1,5 +1,5 @@
 #only ShellApi
-mvn install
+- mvn install
 
 #ShellApi + ShellCore + CorePlugin
-mvn install -P full
+- mvn install -P full

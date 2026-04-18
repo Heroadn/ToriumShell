@@ -47,7 +47,7 @@ mvn install -pl ShellApi
 Run the shell:
 
 ```bash
-java -jar ShellCore/target/ShellCore.jar
+java -jar ToriumShell/target/ShellCore.jar
 ```
 
 Plugins are loaded automatically from the `target/plugins/` directory on startup.

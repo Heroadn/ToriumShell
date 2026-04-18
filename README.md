@@ -140,9 +140,9 @@ import org.example.api.Command.ICommand;
 import org.example.api.Handler.IHandler;
 
 public class HelloHandler implements IHandler {
-
+  
     @Override
-    public void handle(ICommand command) throws Exception {
+    public void execute(ICommand iCommand, IContext iContext, IConsole iConsole) {
         String name = command.getArgs().isEmpty()
             ? "World"
             : command.getArgs().get(0);

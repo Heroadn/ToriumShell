@@ -22,7 +22,7 @@ public class ShellParser extends AbstractParser {
         String first = peek().value.toLowerCase();
 
         if(registry.has(first))
-            dispatch(tokens, first);
+            return dispatch(tokens, first);
 
         //checking for a subcommand
         if (!isEmpty()) {

@@ -21,14 +21,95 @@ Lexer → ShellParser → AbstractParser (subclasses) → IHandler
 
 ## Built-in Commands
 
+### Navigation
+
 | Command | Usage | Description |
 |---------|-------|-------------|
 | `ls` | `ls [-l]` | List directory contents |
 | `cd` | `cd <path>` | Change current directory |
-| `mkdir` | `mkdir <n>` | Create a new directory |
+| `cd` | `cd -` | Return to previous directory |
+| `pwd` | `pwd` | Print current directory path |
+| `mkdir` | `mkdir [-p] <name>` | Create a new directory |
 | `rm` | `rm [-r] <path>` | Remove a file or directory |
+| `tree` | `tree [-d N] [path]` | Print ASCII directory tree (default depth: 4) |
+
+### Files
+
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `cat` | `cat <file>` | Print file contents |
+| `head` | `head [-n N] <file>` | Print first N lines (default: 10) |
+| `tail` | `tail [-n N] <file>` | Print last N lines (default: 10) |
+| `cp` | `cp [-r] <source> <dest>` | Copy a file or directory |
+| `mv` | `mv <source> <dest>` | Move or rename a file or directory |
+| `touch` | `touch <file...>` | Create file or update its timestamp |
+| `wc` | `wc [-l\|-w\|-c] <file>` | Count lines, words and characters |
+| `grep` | `grep [-i] [-n] [-v] [-c] <pattern> <file>` | Search for a pattern in a file |
+| `find` | `find [-t file\|dir] [-d N]` | Find files or directories |
+
+### System
+
+| Command | Usage | Description |
+|---------|-------|-------------|
 | `echo` | `echo <text>` | Print text to the console |
+| `clear` | `clear` | Clear the screen |
+| `date` | `date` | Print current date and time |
+| `history` | `history` | Show command history |
+| `env` | `env` | List environment variables |
+| `set` | `set <key>=<value>` | Set a session variable |
+| `alias` | `alias <name>=<cmd>` | Create a command shortcut |
+| `help` | `help [command]` | Show command description, usage and flags |
+| `plugins` | `plugins` | List loaded plugins with version and commands |
 | `exit` | `exit` | Exit the shell |
+
+### Operators
+
+| Operator | Example | Description |
+|----------|---------|-------------|
+| `>` | `echo hi > file.txt` | Redirect output to file (overwrite) |
+| `>>` | `echo hi >> file.txt` | Redirect output to file (append) |
+| `\|` | `cat file.txt \| grep err` | Pipe output to next command |
+| `&&` | `mkdir a && cd a` | Run next command only if previous succeeded |
+| `;` | `echo a ; echo b` | Run commands sequentially |
+| `$VAR` | `echo $HOME` | Expand session variable |
+
+---
+
+## Customizing the Prompt
+
+ToriumShell reads `~/.toriumshellrc` on startup and applies your preferences. You can also change the prompt at runtime with `config prompt`.
+
+### `.toriumshellrc`
+
+```properties
+prompt={user} {dir} $
+```
+
+Available substitutions:
+
+| Token | Description |
+|-------|-------------|
+| `{user}` | Current username |
+| `{dir}` | Current directory (absolute) |
+| `{home}` | Home directory path |
+
+Example prompts:
+
+```properties
+# minimal
+prompt={dir} $
+
+# git-style
+prompt=[{user}@shell {dir}] >
+```
+
+### Changing the prompt at runtime
+
+```
+config prompt {user} {dir} $
+```
+
+Changes take effect immediately and are saved to `~/.toriumshellrc`.
 
 ---
 
@@ -40,18 +121,86 @@ A virtual pet that lives inside your shell. Stats decay over real time — if yo
 
 | Command | Description |
 |---------|-------------|
-| `tama new <n>` | Create a new pet |
+| `tama new <name>` | Create a new pet |
 | `tama status` | Show pet status with ASCII art and stat bars |
 | `tama eat` | Feed your pet — hunger +30, happiness +10 |
-| `tama feed <food>` | Feed a specific food (`pizza`, `salad`, `candy`) |
+| `tama feed <food>` | Feed a specific food (`pizza`, `salad`, `candy`, `cake`, `water`) |
 | `tama play` | Play with your pet — happiness +25, energy -20 |
 | `tama sleep` | Put your pet to sleep — energy +50, age +1 |
 | `tama medicine` | Cure a sick pet |
-| `tama rename <n>` | Rename your pet |
+| `tama bath` | Clean your pet — removes dirty debuff |
+| `tama train` | Train your pet — XP +15, energy -10 |
+| `tama walk` | Take your pet for a walk — happiness +15, energy -5 |
+| `tama rename <name>` | Rename your pet |
 | `tama history` | Show last 10 events |
 | `tama info` | Quick summary without stat bars |
+| `tama bag` | Show inventory |
+| `tama use <item>` | Use an item from your inventory |
+| `tama achievements` | Show unlocked achievements |
+| `tama list` | List all your pets |
+| `tama switch <name>` | Switch active pet |
+| `tama game` | Open interactive TUI game screen |
 
 Stats decay every hour your shell is closed: hunger -3, happiness -2, energy -1. Pets die after 48h without attention.
+
+**Personalities** affect how fast stats decay and how much XP is gained per action.
+
+### HttpPlugin
+
+Send HTTP requests directly from the shell.
+
+| Command | Description |
+|---------|-------------|
+| `get <url>` | Send a GET request |
+| `post <url>` | Send a POST request |
+| `put <url>` | Send a PUT request |
+| `delete <url>` | Send a DELETE request |
+| `curl <url>` | Alias for get with full response headers |
+| `http-history` | List saved requests |
+| `http-save <name>` | Save last request with a name |
+| `http-run <name>` | Re-run a saved request |
+
+### GitPlugin
+
+Run Git commands without leaving the shell. The current branch is shown in the prompt via `{branch}`.
+
+| Command | Description |
+|---------|-------------|
+| `git status` | Show working tree status |
+| `git add` | Stage changes |
+| `git commit` | Commit staged changes |
+| `git push` | Push to remote |
+| `git pull` | Pull from remote |
+| `git log [-n N]` | Show last N commits (default: 10) |
+| `git branch` | List branches |
+| `git checkout` | Switch branch |
+
+Add `{branch}` to your prompt to always see the active branch:
+
+```properties
+prompt={user} {dir} ({branch}) $
+```
+
+### NotesPlugin
+
+| Command | Description |
+|---------|-------------|
+| `note add` | Add a new note |
+| `note list` | List all notes |
+| `note remove` | Remove a note |
+| `note search` | Search notes by keyword |
+| `note tag` | Tag a note |
+| `note export` | Export notes to a file |
+
+### TodoPlugin
+
+| Command | Description |
+|---------|-------------|
+| `todo add [-p alta\|media\|baixa]` | Add a task with optional priority |
+| `todo list` | List all tasks |
+| `todo done` | Mark a task as done |
+| `todo remove` | Remove a task |
+| `todo stats` | Show completion stats |
 
 ---
 
@@ -209,7 +358,7 @@ public class HelloHandler implements IHandler {
             ? "World"
             : command.getArgs().get(0);
 
-        System.out.println("Hello, " + name + "!");
+        iConsole.println("Hello, " + name + "!");
     }
 }
 ```
@@ -297,22 +446,22 @@ When the shell exits, all classloaders are closed via `PluginLoader.close()`.
 
 ```java
 public interface IHandler {
-    void handle(ICommand command) throws Exception;
+    void execute(ICommand command, IContext context, IConsole console) throws Exception;
 }
 ```
 
 ### `ICommand` / `BaseCommand`
 
-`BaseCommand` provides default implementations for `getArgs()`, `setArgs()`, `getFlags()`, `setFlags()`. Extend it for most commands.
+`BaseCommand` provides default implementations for `getArgs()`, `setArgs()`, `getFlags()`, `setFlags()` and `has(flag)`. Extend it for most commands.
 
 ### `ICommandRegistry`
 
 ```java
 public interface ICommandRegistry {
-    public void register(
-            Class<? extends ICommand> command,
-            Supplier<IParser> parser,
-            Supplier<IHandler> handler);
+    void register(
+        Class<? extends ICommand> command,
+        Supplier<IParser> parser,
+        Supplier<IHandler> handler);
     boolean has(String name);
 }
 ```

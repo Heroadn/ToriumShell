@@ -45,43 +45,23 @@ Lexer → ShellParser → AbstractParser (subclasses) → IHandler
 | `touch` | `touch <file...>` | Create file or update its timestamp |
 | `wc` | `wc [-l\|-w\|-c] <file>` | Count lines, words and characters |
 | `grep` | `grep [-i] [-n] [-v] [-c] <pattern> <file>` | Search for a pattern in a file |
-| `find` | `find [-t file\|dir] [-d N]` | Find files or directories |
 
 ### System
 
 | Command | Usage | Description |
 |---------|-------|-------------|
 | `echo` | `echo <text>` | Print text to the console |
-| `clear` | `clear` | Clear the screen |
-| `date` | `date` | Print current date and time |
-| `history` | `history` | Show command history |
-| `env` | `env` | List environment variables |
-| `set` | `set <key>=<value>` | Set a session variable |
-| `alias` | `alias <name>=<cmd>` | Create a command shortcut |
-| `help` | `help [command]` | Show command description, usage and flags |
-| `plugins` | `plugins` | List loaded plugins with version and commands |
 | `exit` | `exit` | Exit the shell |
-
-### Operators
-
-| Operator | Example | Description |
-|----------|---------|-------------|
-| `>` | `echo hi > file.txt` | Redirect output to file (overwrite) |
-| `>>` | `echo hi >> file.txt` | Redirect output to file (append) |
-| `\|` | `cat file.txt \| grep err` | Pipe output to next command |
-| `&&` | `mkdir a && cd a` | Run next command only if previous succeeded |
-| `;` | `echo a ; echo b` | Run commands sequentially |
-| `$VAR` | `echo $HOME` | Expand session variable |
 
 ---
 
 ## Customizing the Prompt
 
-ToriumShell reads `~/.toriumshellrc` on startup and applies your preferences. You can also change the prompt at runtime with `config prompt`.
+ToriumShell reads `~/.toriumshellrc` on startup and applies your preferences.
 
 ### `.toriumshellrc`
 
-```properties
+```config
 prompt={user} {dir} $
 ```
 
@@ -103,106 +83,7 @@ prompt={dir} $
 prompt=[{user}@shell {dir}] >
 ```
 
-### Changing the prompt at runtime
-
-```
-config prompt {user} {dir} $
-```
-
 Changes take effect immediately and are saved to `~/.toriumshellrc`.
-
----
-
-## Official Plugins
-
-### TamagochiPlugin
-
-A virtual pet that lives inside your shell. Stats decay over real time — if you forget about it for too long, it dies.
-
-| Command | Description |
-|---------|-------------|
-| `tama new <name>` | Create a new pet |
-| `tama status` | Show pet status with ASCII art and stat bars |
-| `tama eat` | Feed your pet — hunger +30, happiness +10 |
-| `tama feed <food>` | Feed a specific food (`pizza`, `salad`, `candy`, `cake`, `water`) |
-| `tama play` | Play with your pet — happiness +25, energy -20 |
-| `tama sleep` | Put your pet to sleep — energy +50, age +1 |
-| `tama medicine` | Cure a sick pet |
-| `tama bath` | Clean your pet — removes dirty debuff |
-| `tama train` | Train your pet — XP +15, energy -10 |
-| `tama walk` | Take your pet for a walk — happiness +15, energy -5 |
-| `tama rename <name>` | Rename your pet |
-| `tama history` | Show last 10 events |
-| `tama info` | Quick summary without stat bars |
-| `tama bag` | Show inventory |
-| `tama use <item>` | Use an item from your inventory |
-| `tama achievements` | Show unlocked achievements |
-| `tama list` | List all your pets |
-| `tama switch <name>` | Switch active pet |
-| `tama game` | Open interactive TUI game screen |
-
-Stats decay every hour your shell is closed: hunger -3, happiness -2, energy -1. Pets die after 48h without attention.
-
-**Personalities** affect how fast stats decay and how much XP is gained per action.
-
-### HttpPlugin
-
-Send HTTP requests directly from the shell.
-
-| Command | Description |
-|---------|-------------|
-| `get <url>` | Send a GET request |
-| `post <url>` | Send a POST request |
-| `put <url>` | Send a PUT request |
-| `delete <url>` | Send a DELETE request |
-| `curl <url>` | Alias for get with full response headers |
-| `http-history` | List saved requests |
-| `http-save <name>` | Save last request with a name |
-| `http-run <name>` | Re-run a saved request |
-
-### GitPlugin
-
-Run Git commands without leaving the shell. The current branch is shown in the prompt via `{branch}`.
-
-| Command | Description |
-|---------|-------------|
-| `git status` | Show working tree status |
-| `git add` | Stage changes |
-| `git commit` | Commit staged changes |
-| `git push` | Push to remote |
-| `git pull` | Pull from remote |
-| `git log [-n N]` | Show last N commits (default: 10) |
-| `git branch` | List branches |
-| `git checkout` | Switch branch |
-
-Add `{branch}` to your prompt to always see the active branch:
-
-```properties
-prompt={user} {dir} ({branch}) $
-```
-
-### NotesPlugin
-
-| Command | Description |
-|---------|-------------|
-| `note add` | Add a new note |
-| `note list` | List all notes |
-| `note remove` | Remove a note |
-| `note search` | Search notes by keyword |
-| `note tag` | Tag a note |
-| `note export` | Export notes to a file |
-
-### TodoPlugin
-
-| Command | Description |
-|---------|-------------|
-| `todo add [-p alta\|media\|baixa]` | Add a task with optional priority |
-| `todo list` | List all tasks |
-| `todo done` | Mark a task as done |
-| `todo remove` | Remove a task |
-| `todo stats` | Show completion stats |
-
----
 
 ## Subcommands
 

@@ -14,4 +14,16 @@ public interface IContext {
     public Boolean isRunning();
 
     public void setRunning(Boolean running);
+
+    void setMode(Mode mode);
+
+    public Mode getMode();
+
+    public String getUserName();
+
+    void setUserName(String userName);
+
+    String getPrompt();
+
+    void setPrompt(String prompt);
 }

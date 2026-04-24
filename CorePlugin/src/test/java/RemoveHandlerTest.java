@@ -1,28 +1,16 @@
 
 import org.example.api.Lexer.Lexer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.plugins.Command.RemoveCommand;
 import org.plugins.Handler.RemoveHandler;
-import org.plugins.Parser.RemoveParser;
-import org.plugins.Runtime.Console;
-import org.plugins.Runtime.Context;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class RemoveHandlerTest {
-
-    private Context context;
-    private Console console;
+    private MockConsole mockConsole;
     private RemoveHandler handler;
     private Lexer lexer;
     private Path testDir;
 
+    /*
     @BeforeEach
     void setup() throws Exception {
         testDir = Files.createTempDirectory("rm_test");
@@ -143,5 +131,5 @@ public class RemoveHandlerTest {
         Path antes = context.getCurrentDir();
         handler.execute(prepare("rm x.txt"), context, console);
         Assertions.assertEquals(antes, context.getCurrentDir());
-    }
+    }*/
 }

@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 //TODO: put loading jar functions into a jar class
 public class PluginLoader {
     private final List<URLClassLoader> classLoaders = new ArrayList<>();
+    private final List<IPlugin> plugins = new ArrayList<>();
     private final PluginContext context;
     private final Path pluginsDir;
 
@@ -55,15 +56,17 @@ public class PluginLoader {
         String className = resolveClassName(entry);
         try {
             Class<?> clazz = cl.loadClass(className);
-            Command[] commands = clazz.getAnnotationsByType(Command.class);
-            if (commands.length == 0) return;
 
             if (isInterfacePluginImplemented(clazz)) {
                 IPlugin plugin = (IPlugin) clazz.getDeclaredConstructor().newInstance();
+                plugin.onStart(context);          // ciclo de vida
+                plugins.add(plugin);              // guardar para o onStop depois
                 println("PluginLoader: carregado - " + plugin.getName());
-            } else {
-                println("PluginLoader: carregado - " + className);
             }
+
+            //
+            Command[] commands = clazz.getAnnotationsByType(Command.class);
+            if (commands.length == 0) return;
 
             for (Command cmd : commands) {
                 registerCommand(clazz, cmd);
@@ -94,14 +97,6 @@ public class PluginLoader {
         return IPlugin.class.isAssignableFrom(clazz);
     }
 
-    private void registerCommand(ICommand command, Command annotation) {
-        context.getCommandRegistry().register(
-                command.getClass(),
-                () -> (IParser) newInstance(annotation.parser()),
-                () -> (IHandler) newInstance(annotation.handler())
-        );
-    }
-
     private static boolean isJar(Path path) {
         return path.toString().endsWith(".jar");
     }
@@ -130,5 +125,6 @@ public class PluginLoader {
 
     public void close() throws IOException {
         for (URLClassLoader cl : classLoaders) cl.close();
+        for (IPlugin plugins : plugins) plugins.onStop(context);
     }
 }

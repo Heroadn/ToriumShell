@@ -1,7 +1,8 @@
-package org.example.core;
+package org.example.core.Shell;
 
 import org.example.api.Command.ICommand;
 import org.example.api.Parser.AbstractParser;
+import org.example.core.CommandRegistry;
 import org.example.core.Exception.UnknownCommandException;
 import org.example.api.Parser.IParser;import org.example.api.Parser.Token;
 

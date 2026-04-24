@@ -23,4 +23,10 @@ public abstract class BaseCommand implements ICommand
     public void setArgs(List<String> args) {
         this.args = args;
     }
+
+    @Override
+    public boolean has(String flag)
+    {
+        return this.getFlags().contains(flag);
+    }
 }

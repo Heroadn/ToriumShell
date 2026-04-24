@@ -1,5 +1,6 @@
-package org.example.core;
+package org.example.core.Shell;
 
+import org.example.core.CommandRegistry;
 import org.example.core.Runtime.Console;
 import org.example.api.Command.ICommand;
 import org.example.api.Handler.IHandler;

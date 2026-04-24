@@ -47,8 +47,7 @@ public class RemoveHandler implements IHandler {
     private static boolean isInCurrentDir(IContext context, Path dir) {
         return dir.startsWith(context.getCurrentDir());
     }
-
-
+    
     private void deleteFolder(Path path) throws Exception {
         try (Stream<Path> paths = Files.walk(path).sorted(reverseOrder()))
         {

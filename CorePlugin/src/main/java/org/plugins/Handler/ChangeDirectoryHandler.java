@@ -8,12 +8,22 @@ import org.plugins.Command.ChangeDirectoryCommand;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class ChangeDirectoryHandler implements IHandler {
 
     @Override
     public void execute(ICommand command, IContext context, IConsole console) throws Exception {
         ChangeDirectoryCommand c = (ChangeDirectoryCommand) command;
+
+        //cd command without a path should go to home
+        if(c.getArgs().isEmpty())
+        {
+            c.setArgs(List.of(
+                    String.valueOf(context.getHome()))
+            );
+        }
+
         String fileName = c.getArgs().getFirst();
         String path = fileName.replace("~", context.getHome().toString());
 

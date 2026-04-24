@@ -11,4 +11,14 @@ public class CorePlugin implements IPlugin {
     public String getName() {
         return "core";
     }
+
+    @Override
+    public void onStart(IPluginContext context)
+    {
+    }
+
+    @Override
+    public void onStop(IPluginContext context)
+    {
+    }
 }

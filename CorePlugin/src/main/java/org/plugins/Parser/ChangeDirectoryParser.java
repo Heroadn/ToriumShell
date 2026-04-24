@@ -4,6 +4,8 @@ import org.example.api.Parser.AbstractParser;
 import org.example.api.Parser.ParsedArgs;
 import org.plugins.Command.ChangeDirectoryCommand;
 
+import java.util.List;
+
 public class ChangeDirectoryParser extends AbstractParser {
 
     public ChangeDirectoryCommand parse() throws Exception
@@ -17,9 +19,6 @@ public class ChangeDirectoryParser extends AbstractParser {
         ParsedArgs parsed = consumeArgs();
         command.setFlags(parsed.flags());
         command.setArgs(parsed.args());
-
-        if(parsed.args().isEmpty())
-            throw new Exception("ERROR: directory EXPECTED: " + peek());
 
         return command;
     }

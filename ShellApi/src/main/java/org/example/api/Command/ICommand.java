@@ -9,4 +9,6 @@ public interface ICommand
 
     void setFlags(List<String> flags);
     void setArgs(List<String> args);
+
+    boolean has(String flag);
 }

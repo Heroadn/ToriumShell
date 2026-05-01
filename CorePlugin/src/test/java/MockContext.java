@@ -2,6 +2,8 @@ import org.example.api.Runtime.IContext;
 import org.example.api.Runtime.Mode;
 
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.LocalDateTime;
 
 class MockContext implements IContext {
     private Path currentDir;
@@ -10,9 +12,11 @@ class MockContext implements IContext {
     private Mode mode = Mode.NORMAL;
     private String userName = "testuser";
     private String prompt = "{user}@shell:{dir} $ ";
+    private Clock clock = Clock.systemDefaultZone();
 
     public MockContext(Path dir) { this.currentDir = dir; this.home = dir; }
 
+    public void setClock(Clock clock) { this.clock = clock; }
     @Override public Path getCurrentDir()              { return currentDir; }
     @Override public void setCurrentDir(Path p)        { this.currentDir = p; }
     @Override public Path getHome()                    { return home; }
@@ -25,4 +29,7 @@ class MockContext implements IContext {
     @Override public void setUserName(String n)        { this.userName = n; }
     @Override public String getPrompt()                { return prompt; }
     @Override public void setPrompt(String p)          { this.prompt = p; }
+    @Override public LocalDateTime getLocalTime() {
+        return LocalDateTime.now(clock);
+    }
 }

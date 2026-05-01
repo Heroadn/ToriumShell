@@ -1,24 +1,18 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
-import org.example.api.Parser.ParsedArgs;
-import org.plugins.Command.EchoCommand;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.*;
 import org.plugins.Command.PwdCommand;
 
-public class PwdParser extends AbstractParser {
+import java.util.List;
+
+public class PwdParser implements IParser {
+    private final IParser delegate
+            = BuildParser.of(PwdCommand::new).build();
 
     @Override
-    public PwdCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        PwdCommand command = new PwdCommand();
-
-        if(!expect("pwd"))
-            throw new Exception("ERROR: echo EXPECTED");
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
-        command.setArgs(parsed.args());
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

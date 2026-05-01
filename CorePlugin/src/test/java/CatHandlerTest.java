@@ -1,4 +1,6 @@
+import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
+import org.example.api.Parser.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,8 @@ import org.plugins.Parser.CatParser;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CatHandlerTest {
@@ -39,9 +43,15 @@ public class CatHandlerTest {
         }
     }
 
-    private CatCommand prepare(String input) throws Exception {
+    private ICommand prepare(String input) throws Exception {
         lexer.setInput(input);
-        return (CatCommand) new CatParser().parse(lexer.tokenizer());
+        List<Token> tokens = new java.util.ArrayList<>(lexer.tokenizer());
+
+        //
+        if (!tokens.isEmpty())
+            tokens.removeFirst();
+
+        return new CatParser().parse(tokens);
     }
 
     // ── leitura básica ─────────────────────────────────────────────
@@ -50,11 +60,9 @@ public class CatHandlerTest {
     void catMostraConteudoArquivo() throws Exception {
         Path file = testDir.resolve("file.txt");
         Files.writeString(file, "hello world");
-
         handler.execute(prepare("cat file.txt"), context, console);
 
         String output = console.output();
-
         assertTrue(output.contains("hello world"));
     }
 

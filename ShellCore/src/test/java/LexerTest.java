@@ -1,5 +1,6 @@
 import org.example.api.Lexer.Lexer;
 import org.example.api.Parser.Token;
+import org.example.api.Parser.TokenType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +16,10 @@ public class LexerTest {
     void setup() {
         lexer = new Lexer();
     }
+
+    // -------------------------------------------------------------------------
+    // tokenizer()
+    // -------------------------------------------------------------------------
 
     @Test
     void tokenizerRetornaListaVaziaParaInputVazio() {
@@ -35,8 +40,8 @@ public class LexerTest {
         lexer.setInput("mkdir");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(1, tokens.size());
-        assertEquals(Token.TYPES.STRING, tokens.get(0).key);
-        assertEquals("mkdir", tokens.get(0).value);
+        assertEquals(TokenType.STRING, tokens.get(0).key());
+        assertEquals("mkdir", tokens.get(0).value());
     }
 
     @Test
@@ -44,8 +49,8 @@ public class LexerTest {
         lexer.setInput("mkdir novapasta");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(2, tokens.size());
-        assertEquals("mkdir",     tokens.get(0).value);
-        assertEquals("novapasta", tokens.get(1).value);
+        assertEquals("mkdir",     tokens.get(0).value());
+        assertEquals("novapasta", tokens.get(1).value());
     }
 
     @Test
@@ -55,64 +60,64 @@ public class LexerTest {
         // tokenizar de novo deve funcionar normalmente (pos foi resetado)
         List<Token> tokens = lexer.tokenizer();
         assertEquals(2, tokens.size());
-        assertEquals("ls", tokens.get(0).value);
+        assertEquals("ls", tokens.get(0).value());
     }
 
     // -------------------------------------------------------------------------
-    // Tokens do tipo STRING
+    // STRING
     // -------------------------------------------------------------------------
 
     @Test
     void stringComLetras() {
         lexer.setInput("ls");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.STRING, t.key);
-        assertEquals("ls", t.value);
+        assertEquals(TokenType.STRING, t.key());
+        assertEquals("ls", t.value());
     }
 
     @Test
     void stringComUnderscoreNoInicio() {
         lexer.setInput("_var");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.STRING, t.key);
-        assertEquals("_var", t.value);
+        assertEquals(TokenType.STRING, t.key());
+        assertEquals("_var", t.value());
     }
 
     @Test
     void stringComLetrasEDigitos() {
         lexer.setInput("pasta123");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.STRING, t.key);
-        assertEquals("pasta123", t.value);
+        assertEquals(TokenType.STRING, t.key());
+        assertEquals("pasta123", t.value());
     }
 
     @Test
     void stringsMultiplasComEspaco() {
         lexer.setInput("cd home");
         List<Token> tokens = lexer.tokenizer();
-        assertEquals("cd",   tokens.get(0).value);
-        assertEquals("home", tokens.get(1).value);
-        assertTrue(tokens.stream().allMatch(tk -> tk.key == Token.TYPES.STRING));
+        assertEquals("cd",   tokens.get(0).value());
+        assertEquals("home", tokens.get(1).value());
+        assertTrue(tokens.stream().allMatch(tk -> tk.key() == TokenType.STRING));
     }
 
     // -------------------------------------------------------------------------
-    // Tokens do tipo NUMBER
+    // NUMBER
     // -------------------------------------------------------------------------
 
     @Test
     void numeroInteiro() {
         lexer.setInput("42");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.NUMBER, t.key);
-        assertEquals("42", t.value);
+        assertEquals(TokenType.NUMBER, t.key());
+        assertEquals("42", t.value());
     }
 
     @Test
     void numeroDecimal() {
         lexer.setInput("3.14");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.NUMBER, t.key);
-        assertEquals("3.14", t.value);
+        assertEquals(TokenType.NUMBER, t.key());
+        assertEquals("3.14", t.value());
     }
 
     @Test
@@ -120,34 +125,35 @@ public class LexerTest {
         lexer.setInput("1 2 3");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(3, tokens.size());
-        tokens.forEach(tk -> assertEquals(Token.TYPES.NUMBER, tk.key));
+        tokens.forEach(tk -> assertEquals(TokenType.NUMBER, tk.key()));
     }
+
+    // -------------------------------------------------------------------------
+    // Flags
+    // -------------------------------------------------------------------------
 
     @Test
     void flagR() {
-        // Esperado pós-fix: "-r" → STRING com valor "-r"
         lexer.setInput("-r");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.STRING, t.key);
-        assertEquals("-r", t.value);
+        assertEquals(TokenType.STRING, t.key());
+        assertEquals("-r", t.value());
     }
 
     @Test
     void flagP() {
         lexer.setInput("-p");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.STRING, t.key);
-        assertEquals("-p", t.value);
+        assertEquals(TokenType.STRING, t.key());
+        assertEquals("-p", t.value());
     }
 
     @Test
-    void flagHifenNaoConsumeNadaSemLetraEmSeguida() {
-        // Se a flag for só "-" (sem letra), deve retornar STRING com valor "-"
-        // e avançar pos para não travar.
+    void flagHifenIsoladoNaoTrava() {
+        // "-" sem letra em seguida → STRING com valor "-", pos avança
         lexer.setInput("- ");
         Token t = lexer.nextToken();
-        // pos deve ter avançado — não pode voltar UNDEFINED por loop infinito
-        assertNotEquals(Token.TYPES.UNDEFINED, t.key);
+        assertNotEquals(TokenType.UNDEFINED, t.key());
     }
 
     @Test
@@ -155,9 +161,9 @@ public class LexerTest {
         lexer.setInput("rm -r pasta");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(3, tokens.size());
-        assertEquals("rm",    tokens.get(0).value);
-        assertEquals("-r",    tokens.get(1).value);
-        assertEquals("pasta", tokens.get(2).value);
+        assertEquals("rm",    tokens.get(0).value());
+        assertEquals("-r",    tokens.get(1).value());
+        assertEquals("pasta", tokens.get(2).value());
     }
 
     @Test
@@ -165,7 +171,7 @@ public class LexerTest {
         lexer.setInput("mkdir -p novapasta");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(3, tokens.size());
-        assertEquals("-p", tokens.get(1).value);
+        assertEquals("-p", tokens.get(1).value());
     }
 
     // -------------------------------------------------------------------------
@@ -176,112 +182,104 @@ public class LexerTest {
     void asterisco() {
         lexer.setInput("*");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.ASTERISK, t.key);
-        assertEquals("*", t.value);
+        assertEquals(TokenType.ASTERISK, t.key());
+        assertEquals("*", t.value());
     }
 
     @Test
     void parentesesEsquerdo() {
         lexer.setInput("(");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.LPAREM, t.key);
+        assertEquals(TokenType.LPAREM, t.key());
     }
 
     @Test
     void parentesesDireito() {
         lexer.setInput(")");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.RPAREM, t.key);
+        assertEquals(TokenType.RPAREM, t.key());
     }
 
     @Test
     void virgula() {
         lexer.setInput(",");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.COMMA, t.key);
+        assertEquals(TokenType.COMMA, t.key());
     }
 
     @Test
-    void ponto_e_virgula() {
+    void pontoEVirgula() {
         lexer.setInput(";");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.SEMICOLON, t.key);
+        assertEquals(TokenType.SEMICOLON, t.key());
     }
-
-    /*
-    @Test
-    void ponto() {
-        lexer.setInput(".");
-        Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.DOT, t.key);
-    }*/
 
     @Test
     void igual() {
         lexer.setInput("=");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals("=", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals("=", t.value());
     }
 
     @Test
     void maiorQue() {
         lexer.setInput(">");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals(">", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals(">", t.value());
     }
 
     @Test
     void menorQue() {
         lexer.setInput("<");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals("<", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals("<", t.value());
     }
 
     @Test
     void exclamacao() {
         lexer.setInput("!");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals("!", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals("!", t.value());
     }
 
     // -------------------------------------------------------------------------
-    // Operadores compostos (dois chars)
+    // Operadores compostos
     // -------------------------------------------------------------------------
 
     @Test
     void operadorIgualIgual() {
         lexer.setInput("==");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals("==", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals("==", t.value());
     }
 
     @Test
     void operadorDiferente() {
         lexer.setInput("!=");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals("!=", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals("!=", t.value());
     }
 
     @Test
     void operadorMenorIgual() {
         lexer.setInput("<=");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals("<=", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals("<=", t.value());
     }
 
     @Test
     void operadorMaiorIgual() {
         lexer.setInput(">=");
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.OPERATOR, t.key);
-        assertEquals(">=", t.value);
+        assertEquals(TokenType.OPERATOR, t.key());
+        assertEquals(">=", t.value());
     }
 
     // -------------------------------------------------------------------------
@@ -293,8 +291,8 @@ public class LexerTest {
         lexer.setInput("ls    src");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(2, tokens.size());
-        assertEquals("ls",  tokens.get(0).value);
-        assertEquals("src", tokens.get(1).value);
+        assertEquals("ls",  tokens.get(0).value());
+        assertEquals("src", tokens.get(1).value());
     }
 
     @Test
@@ -302,15 +300,15 @@ public class LexerTest {
         lexer.setInput("ls\nsrc");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(2, tokens.size());
-        assertEquals("ls",  tokens.get(0).value);
-        assertEquals("src", tokens.get(1).value);
+        assertEquals("ls",  tokens.get(0).value());
+        assertEquals("src", tokens.get(1).value());
     }
 
     @Test
     void ignoraEspacosNoInicio() {
         lexer.setInput("   ls");
         Token t = lexer.nextToken();
-        assertEquals("ls", t.value);
+        assertEquals("ls", t.value());
     }
 
     // -------------------------------------------------------------------------
@@ -322,8 +320,8 @@ public class LexerTest {
         lexer.setInput("x");
         lexer.nextToken(); // consome "x"
         Token t = lexer.nextToken();
-        assertEquals(Token.TYPES.UNDEFINED, t.key);
-        assertEquals("", t.value);
+        assertEquals(TokenType.UNDEFINED, t.key());
+        assertEquals("", t.value());
     }
 
     // -------------------------------------------------------------------------
@@ -333,15 +331,15 @@ public class LexerTest {
     @Test
     void setInputResetaPos() {
         lexer.setInput("mkdir novapasta");
-        lexer.tokenizer(); // avança pos internamente
+        lexer.tokenizer();
         lexer.setInput("ls");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(1, tokens.size());
-        assertEquals("ls", tokens.get(0).value);
+        assertEquals("ls", tokens.get(0).value());
     }
 
     // -------------------------------------------------------------------------
-    // Casos mistos realistas
+    // Casos realistas
     // -------------------------------------------------------------------------
 
     @Test
@@ -349,9 +347,9 @@ public class LexerTest {
         lexer.setInput("rm arquivo -r");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(3, tokens.size());
-        assertEquals("rm",      tokens.get(0).value);
-        assertEquals("arquivo", tokens.get(1).value);
-        assertEquals("-r",      tokens.get(2).value);
+        assertEquals("rm",      tokens.get(0).value());
+        assertEquals("arquivo", tokens.get(1).value());
+        assertEquals("-r",      tokens.get(2).value());
     }
 
     @Test
@@ -359,12 +357,12 @@ public class LexerTest {
         lexer.setInput("mkdir pasta2");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(2, tokens.size());
-        assertEquals("pasta2", tokens.get(1).value);
+        assertEquals("pasta2", tokens.get(1).value());
     }
 
     @Test
     void tokenToStringFormatado() {
-        Token t = new Token(Token.TYPES.STRING, "mkdir");
+        Token t = new Token(TokenType.STRING, "mkdir");
         assertEquals("[STRING : \"mkdir\"]", t.toString());
     }
 
@@ -373,48 +371,42 @@ public class LexerTest {
         lexer.setInput("mkdir pasta/sub /pasta/sub/sub1 ../parent/pasta/sub/");
         List<Token> tokens = lexer.tokenizer();
         assertEquals(4, tokens.size());
-
-        assertEquals("mkdir", tokens.getFirst().value);
-        assertEquals("pasta/sub", tokens.get(1).value);
-
-        assertEquals("/pasta/sub/sub1", tokens.get(2).value);
-        assertEquals("../parent/pasta/sub/", tokens.get(3).value);
+        assertEquals("mkdir",               tokens.get(0).value());
+        assertEquals("pasta/sub",           tokens.get(1).value());
+        assertEquals("/pasta/sub/sub1",     tokens.get(2).value());
+        assertEquals("../parent/pasta/sub/",tokens.get(3).value());
     }
 
     @Test
     void lerCaracteresDesconhecidos() {
         lexer.setInput("@");
         List<Token> tokens = lexer.tokenizer();
-
         assertEquals(1, tokens.size());
-        assertEquals(Token.TYPES.UNDEFINED, tokens.getFirst().key);
+        assertEquals(TokenType.UNDEFINED, tokens.get(0).key());
     }
 
     @Test
     void inputTerminadoEmWhiteSpace() {
         lexer.setInput("ls ");
         List<Token> tokens = lexer.tokenizer();
-
         assertEquals(1, tokens.size());
-        assertEquals(Token.TYPES.STRING, tokens.getFirst().key);
-        assertEquals("ls", tokens.getFirst().value);
+        assertEquals(TokenType.STRING, tokens.get(0).key());
+        assertEquals("ls", tokens.get(0).value());
     }
 
     @Test
     void inputComecadoEmWhiteSpace() {
         lexer.setInput(" ls");
         List<Token> tokens = lexer.tokenizer();
-
         assertEquals(1, tokens.size());
-        assertEquals(Token.TYPES.STRING, tokens.getFirst().key);
-        assertEquals("ls", tokens.getFirst().value);
+        assertEquals(TokenType.STRING, tokens.get(0).key());
+        assertEquals("ls", tokens.get(0).value());
     }
 
     @Test
     void testeComandoRemover() {
         lexer.setInput("rm pasta -r");
         List<Token> tokens = lexer.tokenizer();
-
         assertEquals(3, tokens.size());
     }
 }

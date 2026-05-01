@@ -1,23 +1,20 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
-import org.example.api.Parser.ParsedArgs;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.IParser;
+import org.example.api.Parser.Token;
 import org.plugins.Command.ListCommand;
+import org.example.api.Parser.BuildParser;
 
-public class ListParser extends AbstractParser {
+import java.util.List;
+
+public class ListParser implements IParser {
+    private final IParser delegate
+            = BuildParser.of(ListCommand::new).build();
 
     @Override
-    public ListCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        ListCommand command = new ListCommand();
-
-        if(!expect("ls"))
-            throw new Exception("ERROR: ls EXPECTED");
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
-        command.setArgs(parsed.args());
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

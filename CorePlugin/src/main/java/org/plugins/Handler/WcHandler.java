@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class WcHandler implements IHandler {
 
     @Override
-    public void execute(
+    public int execute(
             ICommand command,
             IContext context,
             IConsole console) throws Exception
@@ -47,6 +47,7 @@ public class WcHandler implements IHandler {
                 + countChars(source)
                 + " "
                 + source.getName());
+        return 0;
     }
 
     public long countLines(File file)

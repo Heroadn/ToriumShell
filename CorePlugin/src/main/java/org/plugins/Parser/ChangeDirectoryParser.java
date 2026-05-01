@@ -10,14 +10,8 @@ public class ChangeDirectoryParser extends AbstractParser {
 
     public ChangeDirectoryCommand parse() throws Exception
     {
-        ChangeDirectoryCommand command = new ChangeDirectoryCommand();
-
-        if(!expect("cd"))
-            throw new Exception("ERROR: cd EXPECTED");
-
-        //
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
+        var command = new ChangeDirectoryCommand();
+        var parsed = consumeArgs(command);
         command.setArgs(parsed.args());
 
         return command;

@@ -1,31 +1,23 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
-import org.example.api.Parser.ParsedArgs;
-import org.plugins.Command.CatCommand;
-import org.plugins.Command.CopyCommand;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.*;
 import org.plugins.Command.MoveCommand;
 
-public class MoveParser extends AbstractParser {
+import java.util.List;
 
-    public MoveParser()
-    {
-        this.allowedFlags.add("-r");
-    }
+public class MoveParser implements IParser
+{
+    private final IParser delegate
+            = BuildParser
+            .of(MoveCommand::new)
+            .allowed("-r")
+            .minArgs(2, "ERROR: fileNames EXPECTED")
+            .build();
 
     @Override
-    public MoveCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        MoveCommand command = new MoveCommand();
-        consume();
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
-        command.setArgs(parsed.args());
-
-        if(command.getArgs().size() < 2)
-            throw new Exception("ERROR: fileNames EXPECTED: " + command.getArgs().size());
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

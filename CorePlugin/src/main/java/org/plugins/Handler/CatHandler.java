@@ -12,7 +12,7 @@ import java.nio.file.Path;
 public class CatHandler implements IHandler {
     //TODO: -n -> number of lines
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         Path path = context.getCurrentDir().resolve(command.getArgs().getFirst());
         File file = new File(path.toString());
 
@@ -26,9 +26,10 @@ public class CatHandler implements IHandler {
         {
             String num = String.valueOf(Files.lines(file.toPath()).count());
             console.println("Número de linhas: " + num);
-            return;
+            return 0;
         }
 
         console.println(Files.readString(file.toPath()));
+        return 0;
     }
 }

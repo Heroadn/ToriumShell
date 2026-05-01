@@ -9,13 +9,8 @@ public class EchoParser extends AbstractParser {
     @Override
     public EchoCommand parse() throws Exception
     {
-        EchoCommand command = new EchoCommand();
-
-        if(!expect("echo"))
-            throw new Exception("ERROR: echo EXPECTED");
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
+        var command = new EchoCommand();
+        var parsed = consumeArgs(command);
         command.setArgs(parsed.args());
 
         return command;

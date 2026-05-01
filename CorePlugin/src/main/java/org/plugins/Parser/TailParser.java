@@ -1,40 +1,27 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
-import org.example.api.Parser.ParsedArgs;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.*;
 import org.plugins.Command.TailCommand;
 
-public class TailParser extends AbstractParser {
+import java.util.List;
 
-    public TailParser()
-    {
-        this.allowedFlags.add("-n");
-    }
+public class TailParser implements IParser
+{
+    private final IParser delegate
+            = BuildParser
+            .of(TailCommand::new)
+            .valued("-n")
+            .validateFlag(
+                    "-n",
+                    Validators::isInt,
+                    "ERROR: argument is not a number")
+            .minArgs(1, "ERROR: fileName EXPECTED")
+            .build();
 
     @Override
-    public TailCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        TailCommand command = new TailCommand();
-        consume(); //tail
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
-        command.setArgs(parsed.args());
-
-        if(command.getArgs().isEmpty())
-            throw new Exception("ERROR: fileName / number of lines EXPECTED");
-
-        if(command.has("-n"))
-        {
-            String input = command.getArgs().getFirst();
-
-            try {
-                Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                throw new Exception("ERROR: argument is not a number " + input);
-            }
-        }
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

@@ -10,12 +10,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
-//@Command(name = "ls", description = "List files", usage = "ls [-a] [path]")
 public class ListHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
-        List<String> args = command.getFlags();
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
+        List<String> args = command.getArgs();
         Path dir = args.isEmpty()
                 ? context.getCurrentDir()
                 : context.getCurrentDir().resolve(args.getFirst());
@@ -31,5 +30,7 @@ public class ListHandler implements IHandler {
                 }
             });
         }
+
+        return 0;
     }
 }

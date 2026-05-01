@@ -13,16 +13,9 @@ import java.util.List;
 public class TailHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         Path path = context.getCurrentDir().resolve(command.getArgs().getFirst());
-        int max = 10;
-
-        if(command.has("-n"))
-        {
-            String input = command.getArgs().getFirst();
-            max  = Integer.parseInt(input);
-            path = context.getCurrentDir().resolve(command.getArgs().get(1));
-        }
+        int max = command.has("-n") ? Integer.parseInt(command.getValue("-n")) : 10;
 
         File file = new File(path.toString());
         if(!file.exists())
@@ -38,5 +31,6 @@ public class TailHandler implements IHandler {
             String line = lines.get(i);
             console.println(line);
         }
+        return 0;
     }
 }

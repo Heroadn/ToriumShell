@@ -15,7 +15,7 @@ import java.util.Locale;
 public class GrepHandler implements IHandler {
 
     @Override
-    public void execute(
+    public int execute(
             ICommand command,
             IContext context,
             IConsole console) throws Exception
@@ -52,6 +52,8 @@ public class GrepHandler implements IHandler {
         {
             console.println(String.valueOf(result.size()));
         }
+
+        return 0;
     }
 
     public List<Long> search(

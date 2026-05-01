@@ -4,7 +4,7 @@ import org.example.api.Runtime.IConsole;
 import org.example.api.Runtime.IContext;
 
 public interface IHandler {
-    void execute(
+    int execute(
             ICommand command,
             IContext context,
             IConsole console) throws Exception;

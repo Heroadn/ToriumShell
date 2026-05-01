@@ -4,12 +4,12 @@ import org.example.api.Runtime.IContext;
 
 public class PromptPrinter {
     public static String print(IContext context) {
-        if(context.getPrompt() == null)
-            return "";
+        String prompt = context.getSession().getPrompt();
+        if(prompt == null) return "";
 
-        return context.getPrompt()
-                .replace("{dir}",  context.getCurrentDir().toString())
-                .replace("{user}", context.getUserName())
-                .replace("{home}", context.getHome().toString());
+        return prompt
+                .replace("{dir}",  context.getRuntime().getCurrentDir().toString())
+                .replace("{user}", context.getSession().getUserName())
+                .replace("{home}", context.getSession().getHome().toString());
     }
 }

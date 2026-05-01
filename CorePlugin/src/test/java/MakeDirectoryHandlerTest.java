@@ -1,14 +1,18 @@
 
+import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
+import org.example.api.Parser.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.plugins.Command.MakeDirectoryCommand;
 import org.plugins.Handler.MakeDirectoryHandler;
+import org.plugins.Parser.CatParser;
 import org.plugins.Parser.MakeDirectoryParser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,9 +40,15 @@ public class MakeDirectoryHandlerTest {
                     .forEach(p -> { try { Files.delete(p); } catch (Exception ignored) {} });
     }
 
-    private MakeDirectoryCommand prepare(String input) throws Exception {
+    private ICommand prepare(String input) throws Exception {
         lexer.setInput(input);
-        return (MakeDirectoryCommand) new MakeDirectoryParser().parse(lexer.tokenizer());
+        List<Token> tokens = new java.util.ArrayList<>(lexer.tokenizer());
+
+        //
+        if (!tokens.isEmpty())
+            tokens.removeFirst();
+
+        return new MakeDirectoryParser().parse(tokens);
     }
 
     // ── criação simples ──────────────────────────────────────────────────────

@@ -3,86 +3,48 @@ import org.example.api.Command.ICommand;
 
 import java.util.*;
 
-public abstract class AbstractParser implements IParser {
-
-    protected Queue<Token> tokens = new LinkedList<>();
-    public Set<String> allowedFlags = new HashSet<>();
+public abstract class AbstractParser extends BaseParser implements IParser{
+    private final Set<String> allowedFlags = new HashSet<>();
+    private final Set<String> valuedFlags  = new HashSet<>();
 
     public ICommand parse(List<Token> tokens) throws Exception {
-        this.tokens = new ArrayDeque<>(tokens);
+        setTokens(tokens);
         return parse();
     }
 
     protected abstract ICommand parse() throws Exception;
 
-    public Token peek()
-    {
-        Token token = this.tokens.peek();
-        if(token == null) token = new Token(Token.TYPES.EOF, "");
-
-        return token;
-    }
-
-    public Boolean peek(Token.TYPES type)
-    {
-        return isEqualType(type);
-    }
-
-    public Boolean peek(String value)
-    {
-        return (Objects.equals(peek().value, value));
-    }
-
-    public Token consume()
-    {
-        Token token = tokens.poll();
-        if(token == null)
-            token = new Token();
-
-        return token;
-    }
-
-    public boolean expect(String value){
-        Token token = consume();
-        return token.value.equalsIgnoreCase(value);
-    }
-
-    public boolean expect(Token.TYPES type)
-    {
-        Token token = consume();
-        return Objects.equals(token.key, type);
-    }
-
-    public ParsedArgs consumeArgs() throws Exception {
-        List<String> flags = new ArrayList<>();
+    public ParsedArgs consumeArgs(ICommand cmd) throws Exception {
         List<String> args = new ArrayList<>();
 
-        while(!isEmpty())
-        {
+        while (!isEmpty()) {
             Token t = peek();
-            String value = consume().value;
+            if (isEndOfFileToken(t)) break;
+            String value = consume().value();
 
-            if(isEndOfFileToken(t)) break;
+            //flags and args
+            if (!isFlagPrefix(value)) {
+                args.add(value);
+                continue;
+            }
 
-            if(isFlagPrefix(t.value) && !isFlagAllowed(value))
+            if (!isFlagAllowed(value))
                 throw new Exception("ERROR: flag not allowed: " + value);
 
-            //
-            if(isFlagPrefix(t.value))
-                flags.add(value);
+            boolean hasNextValue = !isEmpty() && !isEndOfFileToken(peek());
+            boolean expectsValue = valuedFlags.contains(value);
+
+            if (expectsValue && hasNextValue)
+                cmd.put(value, consume().value());
             else
-                args.add(value);
+                cmd.put(value, "");
         }
 
-        return new ParsedArgs(flags, args);
-    }
-
-    private boolean isEqualType(Token.TYPES type) {
-        return peek().key == type;
+        return new ParsedArgs(args);
     }
 
     private boolean isEndOfFileToken(Token t) {
-        return t.key == Token.TYPES.EOF;
+        return t.key() == TokenType.EOF;
     }
 
     private boolean isFlagPrefix(String value) {
@@ -94,17 +56,17 @@ public abstract class AbstractParser implements IParser {
         return allowedFlags.contains(flag);
     }
 
-    public boolean isEmpty()
-    {
-        return this.tokens.isEmpty();
-    }
-
     public int size()
     {
         return this.tokens.size();
     }
+    
+    public void setAllowed(String... flags) {
+        allowedFlags.addAll(List.of(flags));
+    }
 
-    public Queue<Token> getTokens() {
-        return tokens;
+    public void setValued(String... flags) {
+        valuedFlags.addAll(List.of(flags));
+        allowedFlags.addAll(List.of(flags)); // valued já implica allowed
     }
 }

@@ -1,29 +1,9 @@
 package org.example.api.Runtime;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 
 public interface IContext {
-    public Path getCurrentDir();
-
-    public void setCurrentDir(Path currentDir);
-
-    public Path getHome();
-
-    public void setHome(Path home);
-
-    public Boolean isRunning();
-
-    public void setRunning(Boolean running);
-
-    void setMode(Mode mode);
-
-    public Mode getMode();
-
-    public String getUserName();
-
-    void setUserName(String userName);
-
-    String getPrompt();
-
-    void setPrompt(String prompt);
+    ISessionContext getSession();
+    IRuntimeContext getRuntime();
 }

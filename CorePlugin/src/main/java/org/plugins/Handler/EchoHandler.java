@@ -9,7 +9,8 @@ import org.example.api.Runtime.IContext;
 public class EchoHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         console.println(String.join(" ", command.getArgs()));
+        return 0;
     }
 }

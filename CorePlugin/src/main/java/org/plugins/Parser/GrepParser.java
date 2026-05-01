@@ -9,20 +9,14 @@ public class GrepParser extends AbstractParser {
 
     public GrepParser()
     {
-        this.allowedFlags.add("-i");
-        this.allowedFlags.add("-n");
-        this.allowedFlags.add("-v");
-        this.allowedFlags.add("-c");
+        setAllowed("-i", "-n", "-v", "-c");
     }
 
     @Override
     public GrepCommand parse() throws Exception
     {
-        GrepCommand command = new GrepCommand();
-        consume();
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
+        var command = new GrepCommand();
+        var parsed = consumeArgs(command);
         command.setArgs(parsed.args());
 
         if(command.getArgs().size() < 2)

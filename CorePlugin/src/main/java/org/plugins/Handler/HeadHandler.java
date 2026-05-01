@@ -13,7 +13,7 @@ import java.util.List;
 public class HeadHandler implements IHandler {
     //TODO: -n -> number of lines
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         Path path = context.getCurrentDir().resolve(command.getArgs().getFirst());
         int max = 10;
 
@@ -40,5 +40,7 @@ public class HeadHandler implements IHandler {
             String line = lines.get(i);
             console.println(line);
         }
+
+        return 0;
     }
 }

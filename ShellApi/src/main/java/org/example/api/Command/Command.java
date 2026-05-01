@@ -16,4 +16,6 @@ public @interface Command {
     String description() default "";
     String usage() default "";
     String[] flags() default {};
+
+    boolean manual() default false;
 }

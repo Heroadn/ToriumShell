@@ -8,7 +8,8 @@ import org.example.api.Runtime.IContext;
 public class ExitHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         context.setRunning(false);
+        return 0;
     }
 }

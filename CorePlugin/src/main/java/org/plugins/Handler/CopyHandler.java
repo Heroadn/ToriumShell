@@ -16,7 +16,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 public class CopyHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         Path sourcePath = context.getCurrentDir().resolve(command.getArgs().getFirst());
         Path targetPath = context.getCurrentDir().resolve(command.getArgs().get(1));
 
@@ -30,7 +30,7 @@ public class CopyHandler implements IHandler {
         {
             try {
                 copyDirectory(sourcePath, targetPath);
-                return;
+                return 0;
             } catch (IOException e) {
                 console.println("Error during file copy: " + e.getMessage());
             }
@@ -40,6 +40,7 @@ public class CopyHandler implements IHandler {
             throw new Exception("[source] is not a file, for copying directories use -r.");
 
         copyFile(source, target);
+        return 0;
     }
 
     private static void copyDirectory(Path source, Path target) throws IOException {

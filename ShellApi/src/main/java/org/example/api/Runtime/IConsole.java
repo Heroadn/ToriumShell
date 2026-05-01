@@ -2,6 +2,7 @@ package org.example.api.Runtime;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.time.LocalDateTime;
 
 public interface IConsole {
     public void print(String s);

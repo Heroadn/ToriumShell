@@ -13,7 +13,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 public class MoveHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         Path sourcePath = context.getCurrentDir().resolve(command.getArgs().getFirst());
         Path targetPath = context.getCurrentDir().resolve(command.getArgs().get(1));
 
@@ -27,7 +27,7 @@ public class MoveHandler implements IHandler {
         {
             try {
                 moveDirectory(sourcePath, targetPath);
-                return;
+                return 0;
             } catch (IOException e) {
                 console.println("Error during file move: " + e.getMessage());
             }
@@ -40,6 +40,7 @@ public class MoveHandler implements IHandler {
             targetPath = targetPath.resolve(sourcePath.getFileName());
 
         moveFile(sourcePath, targetPath);
+        return 0;
     }
 
     private static void moveDirectory(Path source, Path target) throws IOException

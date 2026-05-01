@@ -1,9 +1,12 @@
+import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
+import org.example.api.Parser.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.plugins.Command.GrepCommand;
 import org.plugins.Handler.GrepHandler;
+import org.plugins.Parser.CatParser;
 import org.plugins.Parser.GrepParser;
 
 import java.nio.file.Files;
@@ -41,9 +44,15 @@ public class GrepHandlerTest {
         }
     }
 
-    private GrepCommand prepare(String input) throws Exception {
+    private ICommand prepare(String input) throws Exception {
         lexer.setInput(input);
-        return (GrepCommand) new GrepParser().parse(lexer.tokenizer());
+        List<Token> tokens = new java.util.ArrayList<>(lexer.tokenizer());
+
+        //
+        if (!tokens.isEmpty())
+            tokens.removeFirst();
+
+        return new GrepParser().parse(tokens);
     }
 
     // ── busca básica ─────────────────────────────────────────────────

@@ -1,14 +1,18 @@
+import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
+import org.example.api.Parser.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.plugins.Command.CopyCommand;
 import org.plugins.Handler.CopyHandler;
+import org.plugins.Parser.CatParser;
 import org.plugins.Parser.CopyParser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,9 +44,15 @@ public class CopyHandlerTest {
         }
     }
 
-    private CopyCommand prepare(String input) throws Exception {
+    private ICommand prepare(String input) throws Exception {
         lexer.setInput(input);
-        return (CopyCommand) new CopyParser().parse(lexer.tokenizer());
+        List<Token> tokens = new java.util.ArrayList<>(lexer.tokenizer());
+
+        //
+        if (!tokens.isEmpty())
+            tokens.removeFirst();
+
+        return new CopyParser().parse(tokens);
     }
 
     // ── arquivo simples ──────────────────────────────────────────────

@@ -2,13 +2,14 @@ package org.example.api.Command;
 
 import java.util.List;
 
-public interface ICommand
-{
-    List<String> getFlags();
+public interface ICommand {
     List<String> getArgs();
+    String getValue(String flag);
 
-    void setFlags(List<String> flags);
     void setArgs(List<String> args);
-
+    void put(String flag, String value);
     boolean has(String flag);
+    boolean isFlagsEmpty();
+
+
 }

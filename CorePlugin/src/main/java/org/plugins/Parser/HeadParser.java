@@ -8,19 +8,14 @@ public class HeadParser extends AbstractParser {
 
     public HeadParser()
     {
-        this.allowedFlags.add("-n");
+        setAllowed("-n");
     }
 
     @Override
     public HeadCommand parse() throws Exception
     {
-        HeadCommand command = new HeadCommand();
-
-        if(!expect("head"))
-            throw new Exception("ERROR: head EXPECTED");
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
+        var command = new HeadCommand();
+        var parsed = consumeArgs(command);
         command.setArgs(parsed.args());
 
         if(command.getArgs().isEmpty())

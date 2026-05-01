@@ -1,9 +1,12 @@
+import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
+import org.example.api.Parser.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.plugins.Command.TouchCommand;
 import org.plugins.Handler.TouchHandler;
+import org.plugins.Parser.CatParser;
 import org.plugins.Parser.TouchParser;
 
 import java.nio.file.Files;
@@ -11,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,9 +46,15 @@ public class TouchHandlerTest {
         }
     }
 
-    private TouchCommand prepare(String input) throws Exception {
+    private ICommand prepare(String input) throws Exception {
         lexer.setInput(input);
-        return (TouchCommand) new TouchParser().parse(lexer.tokenizer());
+        List<Token> tokens = new java.util.ArrayList<>(lexer.tokenizer());
+
+        //
+        if (!tokens.isEmpty())
+            tokens.removeFirst();
+
+        return new TouchParser().parse(tokens);
     }
 
     // ── criação ──────────────────────────────────────────────────────

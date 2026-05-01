@@ -8,7 +8,8 @@ import org.example.api.Runtime.IContext;
 public class PwdHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         console.println(context.getCurrentDir().toString());
+        return 0;
     }
 }

@@ -6,19 +6,15 @@ import org.example.api.Runtime.IConsole;
 import org.example.api.Runtime.IContext;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 
 public class TouchHandler implements IHandler {
 
     @Override
-    public void execute(
+    public int execute(
             ICommand command,
             IContext context,
             IConsole console) throws Exception
@@ -36,6 +32,8 @@ public class TouchHandler implements IHandler {
 
             updateTimeStamp(resolvedPath);
         }
+
+        return 0;
     }
 
     private void updateTimeStamp(String path)

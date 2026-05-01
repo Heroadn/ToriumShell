@@ -12,9 +12,8 @@ import java.util.List;
 public class MakeDirectoryHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception
     {
-        List<String> flags = command.getFlags();
         List<String> args  = command.getArgs();
 
         String fileName = args.getFirst();
@@ -24,15 +23,16 @@ public class MakeDirectoryHandler implements IHandler {
             throw new Exception("Arquivo já existe: " + path);
 
         //is a folder but not -r
-        if(isDirectoriesFlag(flags))
+        if(command.has("-p"))
         {
             Files.createDirectories(path);
             console.println(directoryRecursiveSuccessMessage());
-            return;
+            return 0;
         }
 
         Files.createDirectory(path);
         console.println(directorySuccessMessage());
+        return 0;
     }
 
     public String directorySuccessMessage()
@@ -43,10 +43,6 @@ public class MakeDirectoryHandler implements IHandler {
     public String directoryRecursiveSuccessMessage()
     {
         return "Diretorios criados com sucesso";
-    }
-
-    private static boolean isDirectoriesFlag(List<String> args) {
-        return args.contains("-p");
     }
 
 }

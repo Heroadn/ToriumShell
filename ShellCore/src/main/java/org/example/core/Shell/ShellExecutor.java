@@ -1,6 +1,5 @@
 package org.example.core.Shell;
 
-import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
 
 public class ShellExecutor
@@ -17,7 +16,6 @@ public class ShellExecutor
 
     public void execute(String input) throws Exception {
         lexer.setInput(input);
-        ICommand command = parser.parse(lexer.tokenizer());
-        handler.execute(command);
+        handler.execute(parser.parse(lexer.tokenizer()));
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 public class ChangeDirectoryHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         ChangeDirectoryCommand c = (ChangeDirectoryCommand) command;
 
         //cd command without a path should go to home
@@ -40,5 +40,6 @@ public class ChangeDirectoryHandler implements IHandler {
         }
 
         context.setCurrentDir(newPath);
+        return 0;
     }
 }

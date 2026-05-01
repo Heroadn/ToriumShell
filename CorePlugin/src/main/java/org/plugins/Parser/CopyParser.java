@@ -1,30 +1,23 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
-import org.example.api.Parser.ParsedArgs;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.*;
 import org.plugins.Command.CopyCommand;
-import org.plugins.Command.TailCommand;
 
-public class CopyParser extends AbstractParser {
+import java.util.List;
 
-    public CopyParser()
-    {
-        this.allowedFlags.add("-r");
-    }
+public class CopyParser implements IParser
+{
+    private final IParser delegate
+            = BuildParser
+            .of(CopyCommand::new)
+            .allowed("-r")
+            .minArgs(2, "ERROR: fileNames EXPECTED")
+            .build();
 
     @Override
-    public CopyCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        CopyCommand command = new CopyCommand();
-        consume();
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
-        command.setArgs(parsed.args());
-
-        if(command.getArgs().size() < 2)
-            throw new Exception("ERROR: fileNames EXPECTED: " + command.getArgs().size());
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

@@ -69,8 +69,11 @@ public class PluginLoader {
             if (commands.length == 0) return;
 
             for (Command cmd : commands) {
+                if(cmd.manual()) continue;
+
                 registerCommand(clazz, cmd);
                 println("PluginLoader: registrado - " + cmd.name());
+                //TODO: avisar bus de plugins carregados
             }
 
         } catch (Exception e) {

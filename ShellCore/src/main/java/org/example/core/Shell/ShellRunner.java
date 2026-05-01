@@ -1,6 +1,7 @@
 package org.example.core.Shell;
 
 import org.example.api.Command.ICommand;
+import org.example.api.Event.CommandReceived;
 import org.example.api.Lexer.Lexer;
 import org.example.api.Runtime.IContext;
 import org.example.api.Runtime.InteractiveLoop;
@@ -32,7 +33,7 @@ public class ShellRunner {
         reader.getKeyMaps().get(LineReader.MAIN)
                 .bind(new Reference(LineReader.COMPLETE_WORD), "\t");
 
-        while(context.isRunning())
+        while(context.getRuntime().isRunning())
         {
             String line = readLine(reader, context);
 
@@ -40,7 +41,9 @@ public class ShellRunner {
             if (line.isBlank()) continue;
 
             try {
+                //TODO: bus should not be here
                 executor.execute(line);
+                environment.bus.publish(new CommandReceived(line));
             } catch (Exception e) {
                 console.error(e);
             }
@@ -54,7 +57,7 @@ public class ShellRunner {
                     );
                     loop.run();
                 } finally {
-                    context.setMode(Mode.NORMAL);
+                    context.getRuntime().setMode(Mode.NORMAL);
                     environment.pluginContext.setInteractiveScreen(null);
                 }
             }
@@ -62,7 +65,7 @@ public class ShellRunner {
     }
 
     private static boolean isInteractiveMode(Context context) {
-        return context.getMode() == Mode.INTERACTIVE;
+        return context.getRuntime().getMode() == Mode.INTERACTIVE;
     }
 
     private static boolean isInteractiveScreenNull(ShellEnvironment environment) {

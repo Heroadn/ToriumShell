@@ -1,18 +1,20 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.IParser;
+import org.example.api.Parser.Token;
 import org.plugins.Command.ExitCommand;
+import org.example.api.Parser.BuildParser;
 
-public class ExitParser extends AbstractParser {
+import java.util.List;
+
+public class ExitParser implements IParser {
+    private final IParser delegate
+            = BuildParser.of(ExitCommand::new).build();
 
     @Override
-    public ExitCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        ExitCommand command = new ExitCommand();
-
-        if(!expect("exit"))
-            throw new Exception("ERROR: exit EXPECTED");
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

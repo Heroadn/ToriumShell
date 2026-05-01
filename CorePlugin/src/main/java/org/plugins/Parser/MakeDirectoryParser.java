@@ -1,31 +1,25 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
-import org.example.api.Parser.ParsedArgs;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.IParser;
+import org.example.api.Parser.Token;
 import org.plugins.Command.MakeDirectoryCommand;
+import org.example.api.Parser.BuildParser;
 
-public class MakeDirectoryParser extends AbstractParser {
-    public MakeDirectoryParser()
-    {
-        allowedFlags.add("-p");
-    }
+import java.util.List;
+
+public class MakeDirectoryParser implements IParser
+{
+    private final IParser delegate
+            = BuildParser
+            .of(MakeDirectoryCommand::new)
+            .allowed("-p")
+            .minArgs(1, "ERROR: fileName EXPECTED")
+            .build();
 
     @Override
-    public MakeDirectoryCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        MakeDirectoryCommand command = new MakeDirectoryCommand();
-
-        if(!expect("mkdir"))
-            throw new Exception("ERROR: mkdir EXPECTED");
-
-        //
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
-        command.setArgs(parsed.args());
-
-        if(parsed.args().isEmpty())
-            throw new Exception("ERROR: name of the file EXPECTED");
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

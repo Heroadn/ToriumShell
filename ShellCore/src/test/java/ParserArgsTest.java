@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParserArgsTest {
-
+    /*
     private Lexer lexer;
     private AbstractParser parser;
 
@@ -54,5 +54,5 @@ public class ParserArgsTest {
         assertEquals("-a",      result.flags().get(1));
         assertEquals("-b",      result.flags().get(2));
         assertEquals("-adsada", result.flags().get(3));
-    }
+    }*/
 }

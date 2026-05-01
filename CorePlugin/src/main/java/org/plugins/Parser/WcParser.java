@@ -9,19 +9,14 @@ public class WcParser extends AbstractParser {
 
     public WcParser()
     {
-        this.allowedFlags.add("-l");
-        this.allowedFlags.add("-w");
-        this.allowedFlags.add("-c");
+        setAllowed("-l", "-w", "-c");
     }
 
     @Override
     public WcCommand parse() throws Exception
     {
-        WcCommand command = new WcCommand();
-        consume();
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
+        var command = new WcCommand();
+        var parsed = consumeArgs(command);
         command.setArgs(parsed.args());
 
         if(command.getArgs().isEmpty())

@@ -1,54 +1,99 @@
 package org.example.core.Shell;
 
 import org.example.api.Command.ICommand;
-import org.example.api.Parser.AbstractParser;
+import org.example.api.Handler.IHandler;
+import org.example.api.Parser.*;
 import org.example.core.CommandRegistry;
+import org.example.api.Event.EventBus;
 import org.example.core.Exception.UnknownCommandException;
-import org.example.api.Parser.IParser;import org.example.api.Parser.Token;
+import org.example.core.Parser.ASTNode;
+import org.example.core.Parser.AndNode;
+import org.example.core.Parser.CommandNode;
+import org.example.core.Parser.OrNode;
 
-import java.util.ArrayDeque;
-import java.util.List;
+import java.util.*;
 
-public class ShellParser extends AbstractParser {
+public class ShellParser extends BaseParser{
     private final CommandRegistry registry;
+    private final EventBus bus;
 
-    public ShellParser(CommandRegistry registry)
+    public ShellParser(CommandRegistry registry, EventBus bus)
     {
         this.registry = registry;
+        this.bus = bus;
     }
 
-    public ICommand parse(List<Token> tokens) throws Exception
+    public ASTNode parse(List<Token> tokens) throws Exception
     {
-        this.tokens = new ArrayDeque<>(tokens);
-        String first = peek().value.toLowerCase();
+        setTokens(tokens);
+        return parseExpression();
+    }
 
-        if(registry.has(first))
-            return dispatch(tokens, first);
+    //ls && ls
+    private ASTNode parseExpression() throws Exception {
+        ASTNode left = parseSingleCommand();
 
-        //checking for a subcommand
-        if (!isEmpty()) {
-            String combined = first + "-" + peek().value;
-            if (registry.has(combined)) {
-                consume();
-                return dispatch(tokens, combined);
-            }
+        if (!isEmpty() && isOperator(peek())) {
+            Token op = consume(); // "&&" ou "||"
+
+            ASTNode right = parseExpression();
+
+            if (op.value().equals("&&")) return new AndNode(left, right);
+            if (op.value().equals("||")) return new OrNode(left, right);
         }
 
-        throw new UnknownCommandException(first);
+        return left;
     }
 
-    private ICommand dispatch(
-            List<Token> tokens,
-            String first) throws Exception
+    private ASTNode parseSingleCommand() throws Exception {
+
+        List<String> parts = new ArrayList<>();
+        String command = parseSubCommand(parts);
+
+        if (command == null)
+            throw new UnknownCommandException(parts.isEmpty() ? "" : parts.getFirst());
+
+        // tokens slice before &&, ||, |
+        List<Token> argumentTokens = new ArrayList<>();
+        while (!isEmpty() && !isOperator(peek())) {
+            argumentTokens.add(consume());
+        }
+
+        return dispatch(command, argumentTokens);
+    }
+
+    private String parseSubCommand(List<String> parts) {
+        String last = null;
+
+        while (!isEmpty()) {
+            String current = peek().value().toLowerCase();
+            parts.add(current);
+            String candidate = String.join("-", parts);
+
+            if (registry.has(candidate)) {
+                last = candidate;
+                consume();
+            } else {
+                parts.removeLast();
+                break;
+            }
+        }
+        return last;
+    }
+
+    private ASTNode dispatch(
+            String first, List<Token> tokens) throws Exception
     {
+        //
         IParser parser = this.registry.getParser(first).get();
         if (parser == null) throw new UnknownCommandException(first);
-        return parser.parse(tokens);
-    }
+        ICommand command = parser.parse(tokens);
 
-    @Override
-    protected ICommand parse() throws Exception {
-        return null;
+        //
+        IHandler handler = registry.getHandler(command.getClass()).get();
+        if (handler == null) throw new Exception("Handler não encontrado para: " + first);
+
+        return new CommandNode(command, handler, bus);
     }
 
 }

@@ -1,32 +1,23 @@
 package org.plugins.Parser;
 
-import org.example.api.Parser.AbstractParser;
-import org.example.api.Parser.ParsedArgs;
+import org.example.api.Command.ICommand;
+import org.example.api.Parser.*;
 import org.plugins.Command.CatCommand;
-import org.plugins.Command.PwdCommand;
 
-public class CatParser extends AbstractParser {
+import java.util.List;
 
-    public CatParser()
-    {
-        this.allowedFlags.add("-n");
-    }
+public class CatParser implements IParser
+{
+    private final IParser delegate
+            = BuildParser
+            .of(CatCommand::new)
+            .allowed("-n")
+            .minArgs(1, "ERROR: fileName EXPECTED")
+            .build();
 
     @Override
-    public CatCommand parse() throws Exception
+    public ICommand parse(List<Token> tokens) throws Exception
     {
-        CatCommand command = new CatCommand();
-
-        if(!expect("cat"))
-            throw new Exception("ERROR: cat EXPECTED");
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
-        command.setArgs(parsed.args());
-
-        if(command.getArgs().isEmpty())
-            throw new Exception("ERROR: fileName EXPECTED");
-
-        return command;
+        return delegate.parse(tokens);
     }
 }

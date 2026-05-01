@@ -9,17 +9,14 @@ public class TouchParser extends AbstractParser {
 
     public TouchParser()
     {
-        this.allowedFlags.add("-r");
+        setAllowed("-r");
     }
 
     @Override
     public TouchCommand parse() throws Exception
     {
-        TouchCommand command = new TouchCommand();
-        consume();
-
-        ParsedArgs parsed = consumeArgs();
-        command.setFlags(parsed.flags());
+        var command = new TouchCommand();
+        var parsed = consumeArgs(command);
         command.setArgs(parsed.args());
 
         if(command.getArgs().isEmpty())

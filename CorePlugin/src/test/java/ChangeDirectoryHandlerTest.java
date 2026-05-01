@@ -1,14 +1,18 @@
 
+import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
+import org.example.api.Parser.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.plugins.Command.ChangeDirectoryCommand;
 import org.plugins.Handler.ChangeDirectoryHandler;
+import org.plugins.Parser.CatParser;
 import org.plugins.Parser.ChangeDirectoryParser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,9 +41,15 @@ public class ChangeDirectoryHandlerTest {
                     .forEach(p -> { try { Files.delete(p); } catch (Exception ignored) {} });
     }
 
-    private ChangeDirectoryCommand prepare(String input) throws Exception {
+    private ICommand prepare(String input) throws Exception {
         lexer.setInput(input);
-        return (ChangeDirectoryCommand) new ChangeDirectoryParser().parse(lexer.tokenizer());
+        List<Token> tokens = new java.util.ArrayList<>(lexer.tokenizer());
+
+        //
+        if (!tokens.isEmpty())
+            tokens.removeFirst();
+
+        return new ChangeDirectoryParser().parse(tokens);
     }
 
     // ── navegação ────────────────────────────────────────────────────────────

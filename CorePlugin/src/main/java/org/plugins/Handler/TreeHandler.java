@@ -17,19 +17,18 @@ import java.util.stream.Stream;
 public class TreeHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception {
-        List<String> args = command.getFlags();
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception {
+        List<String> args = command.getArgs();
         Path dir = args.isEmpty()
-                ? context.getCurrentDir()
-                : context.getCurrentDir().resolve(args.getFirst());
+                ? context.getRuntime().getCurrentDir()
+                : context.getRuntime().getCurrentDir().resolve(args.getFirst());
 
-        int maxDepth = 4;
-
-        if(command.has("-n"))
-            maxDepth = Integer.parseInt(command.getArgs().getFirst());
+        int maxDepth = command.has("-d")
+                ? Integer.parseInt(command.getValue("-d")) : 4;
 
         console.println(dir.getFileName().toString());
         printDirs(console, dir, "", 0, maxDepth);
+        return 0;
     }
 
     private static void printDirs(

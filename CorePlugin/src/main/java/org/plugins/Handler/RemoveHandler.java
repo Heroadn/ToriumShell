@@ -15,11 +15,9 @@ import static java.util.Collections.reverseOrder;
 public class RemoveHandler implements IHandler {
 
     @Override
-    public void execute(ICommand command, IContext context, IConsole console) throws Exception
+    public int execute(ICommand command, IContext context, IConsole console) throws Exception
     {
-        List<String> flags = command.getFlags();
         List<String> args = command.getArgs();
-
         String fileName = args.getFirst();
         Path dir = context.getCurrentDir().resolve(fileName);
 
@@ -28,20 +26,21 @@ public class RemoveHandler implements IHandler {
                     "fora do diretorio atual");
 
         //is a folder but not -r
-        if(isDirectory(dir) && !isRecursiveFlag(flags))
+        if(isDirectory(dir) && command.has("-r"))
         {
             throw new Exception("ERROR: Não é um arquivo: " +
                     "use -r para apagar recursivamente");
         }
 
         //all checked
-        if (isDirectory(dir) && isRecursiveFlag(flags)) {
+        if (isDirectory(dir) && command.has("-r")) {
             deleteFolder(dir);
-            return;
+            return 0;
         }
 
         //only one file to delete
         deleteFile(dir);
+        return 0;
     }
 
     private static boolean isInCurrentDir(IContext context, Path dir) {
@@ -64,10 +63,6 @@ public class RemoveHandler implements IHandler {
 
     private static boolean isDirectory(Path dir) {
         return Files.isDirectory(dir);
-    }
-
-    private static boolean isRecursiveFlag(List<String> args) {
-        return args.contains("-r");
     }
 
     private static boolean fileExists(Path dir) {

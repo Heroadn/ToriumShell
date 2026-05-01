@@ -1,4 +1,5 @@
 import org.example.core.PromptPrinter;
+import org.example.core.Runtime.SessionContext;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.*;
@@ -13,48 +14,46 @@ public class PromptPrinterTest {
     @BeforeEach
     void setup() throws Exception {
         testDir = Files.createTempDirectory("prompt_test");
-        context = new MockContext(testDir);
-        context.setUserName("heroadn");
-        context.setHome(testDir);
+        context = new MockContext(testDir, new MockContext.MockSessionContext(testDir, "heroadn"));
     }
 
     @Test
     void substituiDir() {
-        context.setPrompt("{dir} $ ");
+        context.getSession().setPrompt("{dir} $ ");
         String result = PromptPrinter.print(context);
         assertEquals(testDir.toString() + " $ ", result);
     }
 
     @Test
     void substituiUser() {
-        context.setPrompt("{user} $ ");
+        context.getSession().setPrompt("{user} $ ");
         String result = PromptPrinter.print(context);
         assertEquals("heroadn $ ", result);
     }
 
     @Test
     void substituiHome() {
-        context.setPrompt("{home} $ ");
+        context.getSession().setPrompt("{home} $ ");
         String result = PromptPrinter.print(context);
         assertEquals(testDir.toString() + " $ ", result);
     }
 
     @Test
     void substituiTodosDeUmaVez() {
-        context.setPrompt("{user}@shell:{dir} $ ");
+        context.getSession().setPrompt("{user}@shell:{dir} $ ");
         String result = PromptPrinter.print(context);
         assertEquals("heroadn@shell:" + testDir.toString() + " $ ", result);
     }
 
     @Test
     void formatoSemVariaveisRetornaLiteral() {
-        context.setPrompt("shell $ ");
+        context.getSession().setPrompt("shell $ ");
         assertEquals("shell $ ", PromptPrinter.print(context));
     }
 
     @Test
     void promptNullRetornaVazioOuDefault() {
-        context.setPrompt(null);
+        context.getSession().setPrompt(null);
         assertDoesNotThrow(() -> PromptPrinter.print(context));
     }
 }

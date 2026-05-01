@@ -1,14 +1,18 @@
+import org.example.api.Command.ICommand;
 import org.example.api.Lexer.Lexer;
+import org.example.api.Parser.Token;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.plugins.Command.HeadCommand;
 import org.plugins.Handler.HeadHandler;
+import org.plugins.Parser.CatParser;
 import org.plugins.Parser.HeadParser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,9 +45,15 @@ public class HeadHandlerTest {
         }
     }
 
-    private HeadCommand prepare(String input) throws Exception {
+    private ICommand prepare(String input) throws Exception {
         lexer.setInput(input);
-        return (HeadCommand) new HeadParser().parse(lexer.tokenizer());
+        List<Token> tokens = new java.util.ArrayList<>(lexer.tokenizer());
+
+        //
+        if (!tokens.isEmpty())
+            tokens.removeFirst();
+
+        return new HeadParser().parse(tokens);
     }
 
     // ── padrão (10 linhas) ────────────────────────────────────────

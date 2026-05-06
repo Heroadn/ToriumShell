@@ -102,8 +102,8 @@ public class MakeDirectoryHandlerTest {
 
     @Test
     void currentDirNaoMudaAposMkdir() throws Exception {
-        Path antes = context.getCurrentDir();
+        Path antes = context.getRuntime().getCurrentDir();
         handler.execute(prepare("mkdir novapasta"), context, console);
-        assertEquals(antes, context.getCurrentDir());
+        assertEquals(antes, context.getRuntime().getCurrentDir());
     }
 }

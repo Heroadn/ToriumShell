@@ -4,7 +4,7 @@ import org.example.api.Command.ICommand;
 import org.example.api.Handler.IHandler;
 import org.example.api.Parser.*;
 import org.example.core.CommandRegistry;
-import org.example.api.Event.EventBus;
+import org.example.api.Event.IEventBus;
 import org.example.core.Exception.UnknownCommandException;
 import org.example.core.Parser.ASTNode;
 import org.example.core.Parser.AndNode;
@@ -15,9 +15,9 @@ import java.util.*;
 
 public class ShellParser extends BaseParser{
     private final CommandRegistry registry;
-    private final EventBus bus;
+    private final IEventBus bus;
 
-    public ShellParser(CommandRegistry registry, EventBus bus)
+    public ShellParser(CommandRegistry registry, IEventBus bus)
     {
         this.registry = registry;
         this.bus = bus;

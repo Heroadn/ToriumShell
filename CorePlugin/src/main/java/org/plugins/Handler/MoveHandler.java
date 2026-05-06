@@ -14,8 +14,8 @@ public class MoveHandler implements IHandler {
 
     @Override
     public int execute(ICommand command, IContext context, IConsole console) throws Exception {
-        Path sourcePath = context.getCurrentDir().resolve(command.getArgs().getFirst());
-        Path targetPath = context.getCurrentDir().resolve(command.getArgs().get(1));
+        Path sourcePath = context.getRuntime().getCurrentDir().resolve(command.getArgs().getFirst());
+        Path targetPath = context.getRuntime().getCurrentDir().resolve(command.getArgs().get(1));
 
         File source = new File(sourcePath.toString());
         File target = new File(targetPath.toString());

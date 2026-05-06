@@ -14,7 +14,7 @@ public class HeadHandler implements IHandler {
     //TODO: -n -> number of lines
     @Override
     public int execute(ICommand command, IContext context, IConsole console) throws Exception {
-        Path path = context.getCurrentDir().resolve(command.getArgs().getFirst());
+        Path path = context.getRuntime().getCurrentDir().resolve(command.getArgs().getFirst());
         int max = 10;
 
         //head [-n 5] filename
@@ -23,7 +23,7 @@ public class HeadHandler implements IHandler {
         {
             String input = command.getArgs().getFirst();
             max  = Integer.parseInt(input);
-            path = context.getCurrentDir().resolve(command.getArgs().get(1));
+            path = context.getRuntime().getCurrentDir().resolve(command.getArgs().get(1));
         }
 
 

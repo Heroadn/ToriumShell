@@ -1,7 +1,7 @@
 import org.example.core.Parser.ASTNode;
 import org.example.core.Parser.AndNode;
 import org.example.core.Parser.CommandNode;
-import org.example.api.Event.EventBus;
+import org.example.api.Event.IEventBus;
 import org.example.core.Shell.ShellEventBus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,7 @@ import java.util.Comparator;
 public class ASTTest {
     private MockContext context;
     private MockConsole console;
-    private EventBus bus;
+    private IEventBus bus;
     private Path testDir;
 
     @BeforeEach

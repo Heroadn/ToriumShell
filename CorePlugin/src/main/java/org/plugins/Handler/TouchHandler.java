@@ -22,7 +22,7 @@ public class TouchHandler implements IHandler {
 
         for (String path : command.getArgs())
         {
-            String resolvedPath = String.valueOf(context.getCurrentDir().resolve(path));
+            String resolvedPath = String.valueOf(context.getRuntime().getCurrentDir().resolve(path));
             File file = new File(resolvedPath);
             if(!file.exists())
             {

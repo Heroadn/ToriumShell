@@ -19,7 +19,7 @@ public class FindHandler implements IHandler {
             IContext context,
             IConsole console) throws Exception
     {
-        Path path = context.getCurrentDir();
+        Path path = context.getRuntime().getCurrentDir();
         List<String> result = new ArrayList<>();
 
         String type   = command.has("-t") ? command.getValue("-t") : null;

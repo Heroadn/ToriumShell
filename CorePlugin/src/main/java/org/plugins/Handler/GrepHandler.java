@@ -21,7 +21,7 @@ public class GrepHandler implements IHandler {
             IConsole console) throws Exception
     {
         String string = command.getArgs().getFirst();
-        File source = new File(context.getCurrentDir()
+        File source = new File(context.getRuntime().getCurrentDir()
                 .resolve(command.getArgs().get(1))
                 .toString());
 

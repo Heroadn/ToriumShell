@@ -209,7 +209,7 @@ public class FindHandlerTest {
     @Test
     void findEmDiretorioVazioRetornaVazio() throws Exception {
         Path empty = testDir.resolve("emptyDir");
-        context.setCurrentDir(empty);
+        context.getRuntime().setCurrentDir(empty);
         handler.execute(prepare("find"), context, console);
         assertTrue(console.output().isBlank());
     }

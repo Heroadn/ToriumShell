@@ -1,7 +1,7 @@
 package org.example.core.Shell;
 
-import org.example.api.Event.Event;
-import org.example.api.Event.EventBus;
+import org.example.api.Event.IEvent;
+import org.example.api.Event.IEventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class ShellEventBus implements EventBus {
+public class ShellEventBus implements IEventBus {
     private final Map<Class<?>, List<Consumer<?>>> listeners = new HashMap<>();
 
     @Override
-    public <T extends Event> void subscribe(
+    public <T extends IEvent> void subscribe(
             Class<T> type,
             Consumer<T> listener)
     {
@@ -22,7 +22,7 @@ public class ShellEventBus implements EventBus {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Event> void publish(T event) {
+    public <T extends IEvent> void publish(T event) {
         List<Consumer<?>> list = listeners.get(event.getClass());
         if (list == null) return;
         for (Consumer<?> c : list) {
@@ -31,7 +31,7 @@ public class ShellEventBus implements EventBus {
     }
 
     @Override
-    public <T extends Event> void unsubscribe(
+    public <T extends IEvent> void unsubscribe(
             Class<T> type,
             Consumer<T> listener)
     {

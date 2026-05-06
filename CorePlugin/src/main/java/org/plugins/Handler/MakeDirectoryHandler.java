@@ -17,7 +17,7 @@ public class MakeDirectoryHandler implements IHandler {
         List<String> args  = command.getArgs();
 
         String fileName = args.getFirst();
-        Path path = context.getCurrentDir().resolve(fileName);
+        Path path = context.getRuntime().getCurrentDir().resolve(fileName);
 
         if(Files.exists(path))
             throw new Exception("Arquivo já existe: " + path);

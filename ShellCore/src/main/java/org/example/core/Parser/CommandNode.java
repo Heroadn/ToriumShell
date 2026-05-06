@@ -4,19 +4,17 @@ import org.example.api.Command.ICommand;
 import org.example.api.Handler.IHandler;
 import org.example.api.Runtime.IConsole;
 import org.example.api.Runtime.IContext;
-import org.example.api.Event.CommandExecuted;
-import org.example.api.Event.CommandFailed;
-import org.example.api.Event.EventBus;
+import org.example.api.Event.IEventBus;
 
 public class CommandNode implements ASTNode {
     private final ICommand command;
     private final IHandler handler;
-    private final EventBus bus;
+    private final IEventBus bus;
 
     public CommandNode(
             ICommand command,
             IHandler handler,
-            EventBus bus)
+            IEventBus bus)
     {
         this.command = command;
         this.handler = handler;

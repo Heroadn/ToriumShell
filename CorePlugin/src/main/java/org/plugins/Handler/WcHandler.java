@@ -19,7 +19,7 @@ public class WcHandler implements IHandler {
             IContext context,
             IConsole console) throws Exception
     {
-        Path sourcePath = context.getCurrentDir().resolve(command.getArgs().getFirst());
+        Path sourcePath = context.getRuntime().getCurrentDir().resolve(command.getArgs().getFirst());
         File source = new File(sourcePath.toString());
 
         if(!source.exists())

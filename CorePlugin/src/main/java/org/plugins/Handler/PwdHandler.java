@@ -9,7 +9,7 @@ public class PwdHandler implements IHandler {
 
     @Override
     public int execute(ICommand command, IContext context, IConsole console) throws Exception {
-        console.println(context.getCurrentDir().toString());
+        console.println(context.getRuntime().getCurrentDir().toString());
         return 0;
     }
 }

@@ -19,7 +19,7 @@ public class RemoveHandler implements IHandler {
     {
         List<String> args = command.getArgs();
         String fileName = args.getFirst();
-        Path dir = context.getCurrentDir().resolve(fileName);
+        Path dir = context.getRuntime().getCurrentDir().resolve(fileName);
 
         if(fileExists(dir) && !isInCurrentDir(context, dir))
             throw new Exception("ERROR: Não pode deletar arquivo(s)" +
@@ -44,7 +44,7 @@ public class RemoveHandler implements IHandler {
     }
 
     private static boolean isInCurrentDir(IContext context, Path dir) {
-        return dir.startsWith(context.getCurrentDir());
+        return dir.startsWith(context.getRuntime().getCurrentDir());
     }
     
     private void deleteFolder(Path path) throws Exception {

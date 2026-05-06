@@ -20,7 +20,7 @@ public class DateHandler implements IHandler {
                 : "dd-MM-yyyy HH:mm:ss";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 
-        LocalDateTime time = context.getLocalTime();
+        LocalDateTime time = context.getRuntime().getLocalTime();
         console.println(time.format(formatter));
         return 0;
     }

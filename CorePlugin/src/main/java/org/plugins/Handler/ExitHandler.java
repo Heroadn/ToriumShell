@@ -9,7 +9,7 @@ public class ExitHandler implements IHandler {
 
     @Override
     public int execute(ICommand command, IContext context, IConsole console) throws Exception {
-        context.setRunning(false);
+        context.getRuntime().setRunning(false);
         return 0;
     }
 }

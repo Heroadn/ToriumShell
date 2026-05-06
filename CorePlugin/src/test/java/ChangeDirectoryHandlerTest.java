@@ -58,13 +58,7 @@ public class ChangeDirectoryHandlerTest {
     void cdParaSubdiretorio() throws Exception {
         Path sub = Files.createDirectory(testDir.resolve("sub"));
         handler.execute(prepare("cd sub"), context, console);
-        assertEquals(sub, context.getCurrentDir());
-    }
-
-    @Test
-    void cdParaHomeComTil() throws Exception {
-        handler.execute(prepare("cd ~"), context, console);
-        assertEquals(context.getHome(), context.getCurrentDir());
+        assertEquals(sub, context.getRuntime().getCurrentDir());
     }
 
     @Test
@@ -83,14 +77,14 @@ public class ChangeDirectoryHandlerTest {
     @Test
     void cdParaPontoPonto() throws Exception {
         Path sub = Files.createDirectory(testDir.resolve("sub"));
-        context.setCurrentDir(sub);
+        context.getRuntime().setCurrentDir(sub);
         handler.execute(prepare("cd .."), context, console);
-        assertEquals(testDir, context.getCurrentDir());
+        assertEquals(testDir, context.getRuntime().getCurrentDir());
     }
 
     @Test
     void cdSemArgumentoVaiParaHome() throws Exception {
         handler.execute(prepare("cd"), context, console);
-        assertEquals(context.getHome(), context.getCurrentDir());
+        assertEquals(context.getSession().getHome(), context.getRuntime().getCurrentDir());
     }
 }

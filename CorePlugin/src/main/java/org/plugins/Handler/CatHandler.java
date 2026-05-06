@@ -10,10 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class CatHandler implements IHandler {
-    //TODO: -n -> number of lines
+
     @Override
     public int execute(ICommand command, IContext context, IConsole console) throws Exception {
-        Path path = context.getCurrentDir().resolve(command.getArgs().getFirst());
+        Path path = context.getRuntime().getCurrentDir().resolve(command.getArgs().getFirst());
         File file = new File(path.toString());
 
         if(!file.exists())

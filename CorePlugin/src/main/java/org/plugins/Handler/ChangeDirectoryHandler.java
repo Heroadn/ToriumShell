@@ -20,14 +20,14 @@ public class ChangeDirectoryHandler implements IHandler {
         if(c.getArgs().isEmpty())
         {
             c.setArgs(List.of(
-                    String.valueOf(context.getHome()))
+                    String.valueOf(context.getSession().getHome()))
             );
         }
 
         String fileName = c.getArgs().getFirst();
-        String path = fileName.replace("~", context.getHome().toString());
+        String path = fileName.replace("~", context.getSession().getHome().toString());
 
-        Path newPath = context.getCurrentDir()
+        Path newPath = context.getRuntime().getCurrentDir()
                 .resolve(path)
                 .normalize();
 
@@ -39,7 +39,7 @@ public class ChangeDirectoryHandler implements IHandler {
             throw new Exception("Não é um diretório");
         }
 
-        context.setCurrentDir(newPath);
+        context.getRuntime().setCurrentDir(newPath);
         return 0;
     }
 }

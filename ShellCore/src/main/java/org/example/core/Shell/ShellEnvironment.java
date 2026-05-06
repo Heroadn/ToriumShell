@@ -5,7 +5,7 @@ import org.example.api.Runtime.Mode;
 import org.example.core.CommandRegistry;
 import org.example.core.Config;
 import org.example.core.ConfigLoader;
-import org.example.api.Event.EventBus;
+import org.example.api.Event.IEventBus;
 import org.example.core.Main;
 import org.example.core.Plugin.PluginContext;
 import org.example.core.Plugin.PluginLoader;
@@ -35,7 +35,7 @@ public class ShellEnvironment
     public final Lexer lexer;
     public final ShellHandler handler;
     public final ShellParser parser;
-    public final EventBus bus;
+    public final IEventBus bus;
 
     public ShellEnvironment() throws URISyntaxException, IOException {
 

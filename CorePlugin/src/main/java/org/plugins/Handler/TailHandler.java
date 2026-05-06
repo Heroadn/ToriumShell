@@ -14,7 +14,7 @@ public class TailHandler implements IHandler {
 
     @Override
     public int execute(ICommand command, IContext context, IConsole console) throws Exception {
-        Path path = context.getCurrentDir().resolve(command.getArgs().getFirst());
+        Path path = context.getRuntime().getCurrentDir().resolve(command.getArgs().getFirst());
         int max = command.has("-n") ? Integer.parseInt(command.getValue("-n")) : 10;
 
         File file = new File(path.toString());

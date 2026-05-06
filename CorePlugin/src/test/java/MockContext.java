@@ -1,35 +1,43 @@
-import org.example.api.Runtime.IContext;
+import org.example.api.Runtime.IRuntimeContext;
+import org.example.api.Runtime.ISessionContext;
 import org.example.api.Runtime.Mode;
+import org.example.core.Runtime.Context;
+import org.example.core.Runtime.RuntimeContext;
+import org.example.core.Runtime.SessionContext;
 
 import java.nio.file.Path;
 import java.time.Clock;
-import java.time.LocalDateTime;
 
-class MockContext implements IContext {
-    private Path currentDir;
-    private Path home;
-    private boolean running = true;
-    private Mode mode = Mode.NORMAL;
-    private String userName = "testuser";
-    private String prompt = "{user}@shell:{dir} $ ";
+class MockContext extends Context {
+    private static Path currentDir = Path.of("testDir");
+    private static boolean running = true;
+    private static Mode mode = Mode.NORMAL;
+    private static String userName = "testuser";
+    private static String prompt = "{user}@shell:{dir} $ ";
     private Clock clock = Clock.systemDefaultZone();
 
-    public MockContext(Path dir) { this.currentDir = dir; this.home = dir; }
-
-    public void setClock(Clock clock) { this.clock = clock; }
-    @Override public Path getCurrentDir()              { return currentDir; }
-    @Override public void setCurrentDir(Path p)        { this.currentDir = p; }
-    @Override public Path getHome()                    { return home; }
-    @Override public void setHome(Path p)              { this.home = p; }
-    @Override public Boolean isRunning()               { return running; }
-    @Override public void setRunning(Boolean r)        { this.running = r; }
-    @Override public Mode getMode()                    { return mode; }
-    @Override public void setMode(Mode m)              { this.mode = m; }
-    @Override public String getUserName()              { return userName; }
-    @Override public void setUserName(String n)        { this.userName = n; }
-    @Override public String getPrompt()                { return prompt; }
-    @Override public void setPrompt(String p)          { this.prompt = p; }
-    @Override public LocalDateTime getLocalTime() {
-        return LocalDateTime.now(clock);
+    public MockContext(ISessionContext sessionContext, IRuntimeContext runtimeContext) {
+        super(sessionContext, runtimeContext);
     }
+
+    public MockContext(Path testDir)
+    {
+        super(
+                new SessionContext(
+                        Path.of(System.getProperty("user.home")),
+                        System.getProperty("user.name"),
+                        prompt),
+                new RuntimeContext(testDir,
+                        true,
+                        Mode.NORMAL,
+                        0)
+        );
+    }
+
+    public void setClock(Clock utc)
+    {
+        this.clock = utc;
+    }
+
+
 }

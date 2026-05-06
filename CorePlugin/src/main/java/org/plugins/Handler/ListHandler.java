@@ -16,11 +16,9 @@ public class ListHandler implements IHandler {
     public int execute(ICommand command, IContext context, IConsole console) throws Exception {
         List<String> args = command.getArgs();
         Path dir = args.isEmpty()
-                ? context.getCurrentDir()
-                : context.getCurrentDir().resolve(args.getFirst());
+                ? context.getRuntime().getCurrentDir()
+                : context.getRuntime().getCurrentDir().resolve(args.getFirst());
 
-        //TODO:File formatter
-        //TODO:File service class
         try (Stream<Path> stream = Files.list(dir)) {
             stream.forEach(path -> {
                 if (Files.isDirectory(path)) {

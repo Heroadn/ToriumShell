@@ -1,6 +1,6 @@
 import org.example.api.Event.CommandExecuted;
 import org.example.core.Parser.CommandNode;
-import org.example.api.Event.EventBus;
+import org.example.api.Event.IEventBus;
 import org.example.core.Shell.ShellEventBus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +15,11 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EventBusTest {
+public class IIShellEventBusTest {
     private MockContext context;
     private MockConsole console;
     private Path testDir;
-    private EventBus bus;
+    private IEventBus bus;
 
     @BeforeEach
     void setup() throws IOException {

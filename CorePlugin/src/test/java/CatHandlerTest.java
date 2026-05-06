@@ -123,7 +123,7 @@ public class CatHandlerTest {
 
         Files.writeString(file, "conteudo");
 
-        context.setCurrentDir(sub);
+        context.getRuntime().setCurrentDir(sub);
 
         handler.execute(prepare("cat file.txt"), context, console);
 

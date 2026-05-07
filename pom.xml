@@ -11,6 +11,7 @@
 
     <modules>
         <module>ShellApi</module>
+        <module>ShellCore</module>
     </modules>
 
     <profiles>
